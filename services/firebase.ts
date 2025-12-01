@@ -1,3 +1,4 @@
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -17,15 +18,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Wrap analytics in try-catch to prevent crash if blocked (e.g. by adblockers)
-let analytics;
-try {
-  analytics = getAnalytics(app);
-} catch (e) {
-  console.warn("Firebase Analytics could not be initialized (likely blocked by client).", e);
-}
-
+const analytics = getAnalytics(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 

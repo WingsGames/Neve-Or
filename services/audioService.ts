@@ -1,4 +1,5 @@
 
+
 // A lightweight Audio Service using Web Audio API
 // This avoids loading external MP3s and allows for "gentle" synthesized sounds
 
@@ -28,7 +29,7 @@ const createGain = (ctx: AudioContext, startVol: number, endVol: number, duratio
   return gain;
 };
 
-export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover') => {
+export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover' | 'victory') => {
   try {
     const ctx = initAudio();
     const t = ctx.currentTime;
@@ -116,6 +117,43 @@ export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover') =
           osc.start(t);
           osc.frequency.exponentialRampToValueAtTime(800, t + 0.1); // Pitch slide up
           osc.stop(t + 0.15);
+        }
+        break;
+
+      case 'victory':
+        // Fanfare Arpeggio: C4, E4, G4, C5 (Upward arpeggio)
+        {
+          const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; 
+          notes.forEach((freq, i) => {
+            const startTime = t + (i * 0.12);
+            const osc = createOscillator(ctx, 'triangle', freq);
+            // Longer decay for celebratory feel
+            const gain = createGain(ctx, 0.15, 0.001, 1.0);
+            
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.start(startTime);
+            osc.stop(startTime + 1.0);
+          });
+          
+          // Final chord layer
+          setTimeout(() => {
+             const chordRoot = createOscillator(ctx, 'sine', 523.25); // C
+             const chordThird = createOscillator(ctx, 'sine', 659.25); // E
+             const chordFifth = createOscillator(ctx, 'sine', 783.99); // G
+             const chordGain = createGain(ctx, 0.2, 0.001, 1.5);
+             
+             chordRoot.connect(chordGain);
+             chordThird.connect(chordGain);
+             chordFifth.connect(chordGain);
+             chordGain.connect(ctx.destination);
+             
+             const endT = ctx.currentTime;
+             chordRoot.start(endT); chordRoot.stop(endT + 1.5);
+             chordThird.start(endT); chordThird.stop(endT + 1.5);
+             chordFifth.start(endT); chordFifth.stop(endT + 1.5);
+          }, 600);
         }
         break;
     }

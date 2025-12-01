@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useState } from 'react';
 import { GameNode, Language } from '../types';
 import { t } from '../utils/i18n';
@@ -10,9 +14,10 @@ interface Props {
   language: Language;
   onLanguageChange: (lang: Language) => void;
   onOpenDevMode: () => void;
+  onBackToIntro: () => void;
 }
 
-export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguageChange }) => {
+export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguageChange, onBackToIntro }) => {
   // Find the HUB_CONFIG node to get the background image
   const hubConfig = nodes.find(n => n.id === 'HUB_CONFIG');
   const backgroundImage = hubConfig?.data.backgroundImage;
@@ -65,6 +70,20 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
         </div>
       )}
 
+      {/* Back to Intro Button - Positioned safely - POLISHED */}
+      <div className="absolute top-5 right-5 z-50">
+        <button 
+          onClick={() => {
+            playSfx('click');
+            onBackToIntro();
+          }}
+          className="bg-white text-slate-700 px-5 py-2.5 rounded-full shadow-lg font-black text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+        >
+          <span>🏠</span>
+          {language === 'en' ? 'Main Menu' : language === 'ar' ? 'القائمة الرئيسية' : 'תפריט ראשי'}
+        </button>
+      </div>
+
       {/* Map Pins / Nodes Layer */}
       <div className="absolute inset-0 z-10">
         {activeNodes.map((node, index) => {
@@ -73,6 +92,7 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
           // Smart Tooltip Positioning:
           // If node is in the bottom 40% of the screen, show tooltip ABOVE the pin to avoid overlap with bottom UI
           const isBottom = node.coordinates.y > 60;
+          const isActive = !node.isLocked && !node.isCompleted;
           
           return (
             <div 
@@ -85,50 +105,58 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
                    if (!node.isLocked) {
                      playSfx('click');
                      onNodeSelect(node.id);
+                   } else {
+                     playSfx('error');
                    }
                 }}
                 disabled={node.isLocked}
-                className={`relative group/pin flex flex-col items-center transition-all duration-300 ${node.isLocked ? 'opacity-90 grayscale-[0.8]' : 'hover:scale-110 cursor-pointer'}`}
+                className={`relative group/pin flex flex-col items-center transition-all duration-300 ${node.isLocked ? 'opacity-80 grayscale cursor-not-allowed' : 'hover:scale-110 cursor-pointer'}`}
               >
                 {/* Connection Line to Ground */}
-                <div className="hidden sm:block w-0.5 h-8 bg-black/30 absolute top-full left-1/2 -translate-x-1/2 origin-top transform scale-y-0 transition-transform duration-300 group-hover/pin:scale-y-100"></div>
-                <div className="hidden sm:block w-4 h-1 bg-black/40 rounded-full absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 opacity-0 group-hover/pin:opacity-100 transition-opacity duration-300 blur-[2px]"></div>
+                <div className="hidden sm:block w-0.5 h-6 bg-black/30 absolute top-full left-1/2 -translate-x-1/2 origin-top transform scale-y-0 transition-transform duration-300 group-hover/pin:scale-y-100"></div>
+                <div className="hidden sm:block w-3 h-1 bg-black/40 rounded-full absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2 opacity-0 group-hover/pin:opacity-100 transition-opacity duration-300 blur-[2px]"></div>
 
-                {/* Number Badge */}
-                <div className="absolute -top-3 -right-3 w-6 h-6 sm:w-8 sm:h-8 bg-yellow-400 text-blue-900 rounded-full border-[3px] border-white flex items-center justify-center font-black text-xs sm:text-sm shadow-md z-30 transform transition-transform group-hover/pin:rotate-12">
+                {/* Number Badge - Smaller */}
+                <div className="absolute -top-2 -right-2 w-5 h-5 sm:w-7 sm:h-7 bg-yellow-400 text-blue-900 rounded-full border-[2px] border-white flex items-center justify-center font-black text-[10px] sm:text-xs shadow-md z-30 transform transition-transform group-hover/pin:rotate-12">
                   {index + 1}
                 </div>
+                
+                {/* NEW! Badge for Next Level */}
+                {isActive && (
+                   <>
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white animate-bounce z-40 whitespace-nowrap">
+                      {language === 'he' ? '!חדש' : 'New!'}
+                    </div>
+                    {/* Ring Pulse */}
+                    <div className="absolute inset-0 rounded-3xl ring-4 ring-blue-400 animate-ping opacity-50"></div>
+                   </>
+                )}
 
-                {/* Pin Icon - Responsive Size */}
-                <div className={`w-12 h-12 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl rotate-45 flex items-center justify-center shadow-2xl border-[3px] sm:border-[5px] border-white transition-all relative z-20 overflow-hidden
-                  ${node.isCompleted ? 'bg-gradient-to-br from-green-400 to-green-600' : node.isLocked ? 'bg-gradient-to-br from-slate-400 to-slate-600' : 'bg-gradient-to-br from-blue-500 to-blue-700 hover:shadow-blue-500/50'}
+                {/* Pin Icon - Reduced Size */}
+                <div className={`w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl rotate-45 flex items-center justify-center shadow-2xl border-[3px] sm:border-[4px] border-white transition-all relative z-20 overflow-hidden
+                  ${node.isCompleted ? 'bg-gradient-to-br from-green-400 to-green-600' : node.isLocked ? 'bg-gradient-to-br from-gray-400 to-gray-500' : 'bg-gradient-to-br from-blue-500 to-blue-700 hover:shadow-blue-500/50'}
                 `}>
-                  <span className="-rotate-45 text-2xl sm:text-4xl drop-shadow-md filter text-white">
+                  <span className="-rotate-45 text-lg sm:text-3xl drop-shadow-md filter text-white">
                      {node.isCompleted ? '✓' : node.isLocked ? '🔒' : node.type === 'QUIZ' ? '🔑' : '📍'}
                   </span>
                   
                   {/* Shine effect */}
-                  <div className="absolute inset-0 bg-white/30 -skew-x-12 -translate-x-full group-hover/pin:animate-shine"></div>
+                  {!node.isLocked && <div className="absolute inset-0 bg-white/30 -skew-x-12 -translate-x-full group-hover/pin:animate-shine"></div>}
                 </div>
-
-                {/* Pulse Effect for active unlocked nodes */}
-                {!node.isLocked && !node.isCompleted && (
-                  <div className="absolute inset-0 bg-blue-400 rounded-2xl rotate-45 animate-ping opacity-30 -z-10 scale-150"></div>
-                )}
 
                 {/* Label (Tooltip style) - Smart Positioning */}
                 <div className={`
-                  absolute px-4 py-2 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-blue-100 
-                  text-sm font-bold text-gray-800 whitespace-nowrap opacity-0 
+                  absolute px-4 py-2 bg-white/95 backdrop-blur-md rounded-xl shadow-xl 
+                  text-xs sm:text-sm font-bold text-gray-800 whitespace-nowrap opacity-0 
                   group-hover/pin:opacity-100 transition-all duration-300 z-30 flex flex-col items-center 
-                  after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:border-8 after:border-transparent pointer-events-none
+                  after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:border-[6px] after:border-transparent pointer-events-none
                   ${isBottom 
-                    ? 'bottom-[calc(100%+20px)] translate-y-2 group-hover/pin:translate-y-0 after:-bottom-4 after:border-t-white/95 after:border-b-transparent' 
-                    : 'top-[calc(100%+20px)] -translate-y-2 group-hover/pin:translate-y-0 after:-top-4 after:border-b-white/95 after:border-t-transparent'
+                    ? 'bottom-[calc(100%+16px)] translate-y-2 group-hover/pin:translate-y-0 after:-bottom-3 after:border-t-white/95 after:border-b-transparent' 
+                    : 'top-[calc(100%+16px)] -translate-y-2 group-hover/pin:translate-y-0 after:-top-3 after:border-b-white/95 after:border-t-transparent'
                   }
                 `}>
                   {node.title}
-                  {node.isLocked && <span className="text-[10px] text-red-400 font-normal uppercase tracking-wider mt-0.5">LOCKED</span>}
+                  {node.isLocked && <span className="text-[9px] text-red-400 font-normal uppercase tracking-wider block text-center leading-none mt-0.5">LOCKED</span>}
                 </div>
               </button>
             </div>
@@ -138,13 +166,13 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
       
       {/* UI Controls - Positioned in BOTTOM CORNERS to avoid overlap with map pins */}
 
-      {/* Legend - Bottom Right */}
-      <div className="absolute bottom-6 right-6 z-40 flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-2xl border border-gray-100 animate-fade-in-up">
+      {/* Legend - Bottom Right - POLISHED */}
+      <div className="absolute bottom-6 right-6 z-40 flex items-center gap-3 sm:gap-4 bg-white/95 backdrop-blur px-5 py-2.5 rounded-full shadow-xl animate-fade-in-up">
         <LegendItem color="bg-blue-600" label={t('open', language)} />
-        <div className="w-px h-3 bg-gray-200"></div>
+        <div className="w-px h-4 bg-gray-200"></div>
         <LegendItem color="bg-green-500" label={t('completed', language)} />
-        <div className="w-px h-3 bg-gray-200"></div>
-        <LegendItem color="bg-slate-500" label={t('locked', language)} />
+        <div className="w-px h-4 bg-gray-200"></div>
+        <LegendItem color="bg-gray-400" label={t('locked', language)} />
       </div>
 
     </div>
@@ -152,8 +180,8 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
 };
 
 const LegendItem = ({ color, label }: { color: string, label: string }) => (
-  <div className="flex items-center gap-1.5">
-    <div className={`w-2.5 h-2.5 rounded-full ${color} shadow-sm ring-2 ring-gray-100`}></div>
-    <span className="text-xs font-bold text-gray-700 whitespace-nowrap">{label}</span>
+  <div className="flex items-center gap-2">
+    <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${color} shadow-sm ring-2 ring-gray-100`}></div>
+    <span className="text-[10px] sm:text-xs font-bold text-gray-700 whitespace-nowrap">{label}</span>
   </div>
 );

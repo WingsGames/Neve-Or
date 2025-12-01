@@ -1,10 +1,14 @@
 
 
+
+
+
+
 import { GameNode, NodeType, InteractionType, Language } from './types';
 
 // CENTRALIZED STORAGE KEY
 // Bump version to force reset for new content
-export const STORAGE_KEY = 'neve_or_game_state_v9';
+export const STORAGE_KEY = 'neve_or_game_state_v13';
 
 // --- IMAGES (Reusing existing assets where applicable) ---
 const IMG = {
@@ -22,6 +26,9 @@ const IMG = {
   NEWSPAPER: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fnewspaper_office_1764152226500.jpg?alt=media&v=1',
   COURT: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fsupreme_court_1764534551866.jpg?alt=media&v=1',
 };
+
+// NOTE: Only the first scenario (school_lior) is unlocked initially.
+// The rest are isLocked: true.
 
 const HE_NODES: GameNode[] = [
     {
@@ -56,11 +63,11 @@ const HE_NODES: GameNode[] = [
     },
     {
       id: 'school_lior',
-      title: 'בית ספר - הבחירה של ליאור',
+      title: '1. הבחירה של ליאור',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: false, // FIRST LEVEL UNLOCKED
       isCompleted: false,
-      coordinates: { x: 15, y: 20 },
+      coordinates: { x: 15, y: 28 },
       data: {
         description: 'ליאור מגלה שבמבנה בית הספר שלו יש סדקים מסוכנים בתקרה, עם סכנת קריסה וודאית. הוא מדווח למנהל, אבל המנהל אומר: "אין תקציב לתיקונים עכשיו".',
         backgroundImage: IMG.SCHOOL_LIOR,
@@ -80,10 +87,10 @@ const HE_NODES: GameNode[] = [
         },
         decisionQuestion: 'ליאור צריך לקבל החלטה: איך הוא יגן על הזכות לחיים ולביטחון האישי של תלמידי בית הספר?',
         options: [
-          { id: 'opt1', text: 'לתעד ולפנות למשרד החינוך', feedback: 'פנייה לגורם בכיר היא יעילה, אך התהליך עלול להיות איטי.' },
-          { id: 'opt2', text: 'להחתים עצומה עם תלמידים', feedback: 'כוח קבוצתי מייצר לחץ, אך המנהל עלול לכעוס או להתעלם.' },
-          { id: 'opt3', text: 'להתקשר להורים וליידע אותם', feedback: 'הורים יכולים לפעול במהירות, אך זה עלול ליצור עימות חריף.' },
-          { id: 'opt4', text: 'לא לעשות כלום', feedback: 'הסכנה נשארת, וייתכן שתקרה תאונה. זו לא הדרך.' }
+          { id: 'opt1', text: 'לתעד את הסדקים ולפנות למשרד החינוך או לרשות המקומית.', feedback: 'יתרון: פנייה לגורם בכיר שמחויב לבטיחות. חיסרון: התהליך עלול להיות איטי.' },
+          { id: 'opt2', text: 'להתארגן עם עוד תלמידים ולהחתים עצומה, ולהציג אותה למנהל.', feedback: 'יתרון: כוח קבוצתי מייצר לחץ. חיסרון: המנהל עלול לכעוס או להתעלם.' },
+          { id: 'opt3', text: 'להתקשר להורים וליידע אותם על הסכנה.', feedback: 'יתרון: הורים יכולים לפעול במהירות ולעיתים יותר משפיעים. חיסרון: זה יכול ליצור עימות בין ההורים לבית הספר.' },
+          { id: 'opt4', text: 'לא לעשות כלום – "אולי הסדקים לא באמת מסוכנים כל כך".', feedback: 'יתרון: אף אחד לא מתעצבן. חיסרון: הסכנה נשארת, וייתכן שתקרה תאונה.' }
         ],
         moreInfoTitle: 'הזכות לחיים ולביטחון',
         moreInfoContent: 'במצבים שיש בהם סכנה ממשית לחיים או לביטחון האישי, פעולה מהירה היא הכרחית. כשמדובר בבטיחות, הזמן הוא גורם מציל חיים. התגובה המהירה היא ההבדל בין תאונה לבין מניעה.'
@@ -91,11 +98,11 @@ const HE_NODES: GameNode[] = [
     },
     {
       id: 'town_square',
-      title: 'כיכר העיר - הגנה על המרחב',
+      title: '2. הגנה על המרחב',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 50, y: 50 },
+      coordinates: { x: 35, y: 65 },
       data: {
         description: 'מטרה: לזהות מתי הביטחון האישי של אדם נפגע ולבחור מה המדינה צריכה לעשות. גררו את "המגן" רק לסיטואציות שמבטאות פגיעה בביטחון האישי.',
         backgroundImage: IMG.TOWN_SQUARE,
@@ -117,11 +124,11 @@ const HE_NODES: GameNode[] = [
     },
     {
       id: 'city_hall',
-      title: 'העירייה - העיר שמצלמת הכול',
+      title: '3. העיר שמצלמת הכול',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 50, y: 15 },
+      coordinates: { x: 50, y: 25 },
       data: {
         description: 'נווה אור מתמודדת עם עלייה בפשיעה. ראש העיר שוקל להוסיף אלפי מצלמות AI עם זיהוי פנים. הוא מבקש ממך, היועץ לזכויות אדם, לדבר עם התושבים לפני שתמליץ.',
         backgroundImage: IMG.CITY_HALL,
@@ -137,7 +144,7 @@ const HE_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_SQUARE,
             dialog: [
               { id: '1', speaker: 'תושב מבוגר', text: 'פעם פחדתי לצאת מהבית בלילה. מאז שהתקינו מצלמות, אני סוף סוף מרגיש בטוח. אם יש פושע – יתפסו אותו מיד. זה שווה הכול.', mood: 'happy' },
-              { id: '2', speaker: 'קריין', text: 'רמז לתלמיד: הזכות לביטחון אישי כוללת הגנה מפני סכנה ופגיעה בגוף ובחיים.', mood: 'neutral' }
+              { id: '2', speaker: 'מידע', text: 'רמז לתלמיד: הזכות לביטחון אישי כוללת הגנה מפני סכנה ופגיעה בגוף ובחיים.', mood: 'neutral' }
             ]
           },
           {
@@ -147,7 +154,7 @@ const HE_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_CAFE,
             dialog: [
               { id: '1', speaker: 'צעירה עם מחשב', text: 'אתה מבין? אני לא עושה כלום רע, אבל אני מרגישה שמישהו תמיד צופה בי. כל תנועה שלי מוקלטת. ככה לא מרגישים חופשיים. ביטחון? אולי. אבל גם פחד.', mood: 'concerned' },
-              { id: '2', speaker: 'קריין', text: 'רמז לתלמיד: הזכות לפרטיות מגנה על האדם מפני מעקב וחדירה לחייו האישיים.', mood: 'neutral' }
+              { id: '2', speaker: 'מידע', text: 'רמז לתלמיד: הזכות לפרטיות מגנה על האדם מפני מעקב וחדירה לחייו האישיים.', mood: 'neutral' }
             ]
           },
           {
@@ -157,7 +164,7 @@ const HE_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_NEIGHBORHOOD,
             dialog: [
               { id: '1', speaker: 'נער', text: 'יש לי חבר אתיופי. הוא אומר שכל פעם שהוא עובר ליד מצלמה, הוא חושש שהמערכת תחשוב שהוא חשוד.', mood: 'concerned' },
-              { id: '2', speaker: 'קריין', text: 'רמז לתלמיד: טכנולוגיית זיהוי פנים של הבינה המלאכותית לא מושלמת ויכולה להפלות בגלל הטיות.', mood: 'neutral' }
+              { id: '2', speaker: 'מידע', text: 'רמז לתלמיד: טכנולוגיית זיהוי פנים של הבינה המלאכותית לא מושלמת ויכולה להפלות בגלל הטיות.', mood: 'neutral' }
             ]
           },
           {
@@ -167,7 +174,7 @@ const HE_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_SCHOOL,
             dialog: [
               { id: '1', speaker: 'תלמיד', text: 'אם היו פה שוטרים שמכירים אותנו, כמו מפקחים קבועים מהקהילה, היינו מרגישים יותר בטוחים בלי מצלמות. ביטחון זה לא רק מי שמצלם אותך, זה גם מי שמקשיב לך.', mood: 'neutral' },
-              { id: '2', speaker: 'קריין', text: 'רמז לתלמיד: ביטחון אמיתי מבוסס גם על אמון ושיתוף פעולה בין האזרחים למדינה.', mood: 'neutral' }
+              { id: '2', speaker: 'מידע', text: 'רמז לתלמיד: ביטחון אמיתי מבוסס גם על אמון ושיתוף פעולה בין האזרחים למדינה.', mood: 'neutral' }
             ]
           }
         ],
@@ -178,21 +185,25 @@ const HE_NODES: GameNode[] = [
           { id: '3', text: 'לשלב בין מצלמות בפיקוח הדוק לשיטור קהילתי', feedback: 'מצלמות מוצבות רק במוקדי סיכון, תחת פיקוח ושקיפות. שיעור הפשיעה יורד, ותחושת החופש נשמרת. האיזון בין ביטחון לפרטיות יוצר ביטחון אמיתי.' }
         ],
         moreInfoTitle: 'האיזון הראוי',
-        moreInfoContent: `האיזון הראוי בין הזכות לביטחון אישי לבין הזכות לפרטיות מחייב בחינה של מידתיות. שתי הזכויות מעוגנות בחוק-יסוד: כבוד האדם וחירותו.
-        
-עקרונות לשימוש במצלמות:
-• תכלית ראויה – למניעת פשיעה ולא למעקב פוליטי.
-• מידתיות – שימוש מינימלי הכרחי.
-• הגבלת שימוש – המידע לא יועבר לגורמים לא מוסמכים.
-• פיקוח ושקיפות.`
+        moreInfoContent: `האיזון הראוי בין הזכות לביטחון אישי לבין הזכות לפרטיות מחייב בחינה של מידתיות והכרחיות השימוש באמצעי המעקב.
+
+שתי הזכויות הן זכויות יסוד מוכרות במשפט הישראלי, המעוגנות בפסיקת בית המשפט העליון ובחוק-יסוד: כבוד האדם וחירותו.
+מצד אחד, למדינה אחריות להגן על חיי אזרחיה ולשמור על ביטחונם; מצד שני, הזכות לפרטיות מגנה על האדם מפני חדירה למרחב חייו האישיים ומעקב בלתי סביר מצד השלטון.
+לפיכך, שימוש במצלמות חכמות וזיהוי פנים יכול להיות מוצדק רק אם הוא עומד בעקרונות הבאים:
+תכלית ראויה –  המעקב נועד למנוע פשיעה ממשית או סכנה ביטחונית ולא לשימוש כללי או פוליטי.
+מידתיות –  יש להשתמש באמצעי הפוגעני פחות האפשרי (למשל, טשטוש פנים של אנשים שאינם חשודים).
+הגבלת שימוש –  המידע יישמר רק לזמן הדרוש למטרה לשמה נאסף ולא יועבר לגורמים לא מוסמכים.
+פיקוח ושקיפות –  נדרש מנגנון פיקוח עצמאי ודיווח לציבור על היקף השימוש במצלמות.
+במילים אחרות,  ביטחון הציבור אינו גובר אוטומטית על הזכות לפרטיות, אלא רק במידה הדרושה והמידתית לשם שמירה אמיתית על שלום הציבור, תוך שמירה על ערכי הדמוקרטיה וזכויות האדם.`
       }
     },
     {
       id: 'intro_freedom_speech',
-      title: 'הקדמה - הקול שלי',
+      title: '4. הקול שלי',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
+      coordinates: { x: 72, y: 56 },
       data: {
         description: 'המשימה: פוצצו רק את הבלונים שמראים פגיעה בחופש הביטוי!',
         backgroundImage: IMG.FREEDOM_INTRO, 
@@ -214,11 +225,11 @@ const HE_NODES: GameNode[] = [
     },
     {
       id: 'school_tamara',
-      title: 'בית ספר - תמרה',
+      title: '5. מחאת התלמידים',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 85, y: 20 },
+      coordinates: { x: 85, y: 28 },
       data: {
         description: 'תמרה, תלמידת י\', כותבת פוסט בפייסבוק נגד המנהלת שביטלה את מועצת התלמידים ללא התייעצות. היא מכנה אותה "דיקטטורית".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -236,9 +247,9 @@ const HE_NODES: GameNode[] = [
         interactionType: InteractionType.NONE,
         decisionQuestion: 'מה צריך לקרות עכשיו?',
         options: [
-          { id: '1', text: 'להשעות את תמרה מיד!', feedback: 'תגובה חריפה מדי. לתלמידים יש זכות לחופש ביטוי.' },
-          { id: '2', text: 'תמרה יכולה לבקר, אך צריכה לשנות ניסוח', feedback: 'נכון. חופש הביטוי חשוב אך אינו מוחלט. יש לשמור על כבוד האדם.' },
-          { id: '3', text: 'תמרה יכולה לכתוב מה שהיא רוצה', feedback: 'לא מדויק. חופש הביטוי אינו מתיר לשון הרע.' }
+          { id: '1', text: 'להשעות את תמרה מיד! - אי אפשר לקרוא למנהלת \'דיקטטורית\' בפומבית.', feedback: 'תגובה חריפה מדי. לתלמידים יש זכות לחופש ביטוי.' },
+          { id: '2', text: 'תמרה יכולה לבקר את ההחלטה, אבל צריכה לשנות לניסוח ביקורתי שלא מעליב.', feedback: 'נכון. חופש הביטוי חשוב אך אינו מוחלט. יש לשמור על כבוד האדם.' },
+          { id: '3', text: 'תמרה יכולה לכתוב מה שהיא רוצה - חופש הביטוי מוחלט.', feedback: 'לא מדויק. חופש הביטוי אינו מתיר לשון הרע.' }
         ],
         moreInfoTitle: 'זכויות התלמיד',
         moreInfoContent: 'אמנת זכויות הילד וחוק יסוד כבוד האדם מעניקים לתלמידים חופש ביטוי וזכות השתתפות. ביטול מועצת תלמידים מנוגד לרוח חוק זכויות התלמיד (סעיף 13), הקובע שמוסד חינוך יעודד הקמת מועצה.'
@@ -246,9 +257,9 @@ const HE_NODES: GameNode[] = [
     },
     {
       id: 'newspaper_office',
-      title: 'מערכת העיתון "הדופק"',
+      title: '6. מערכת העיתון',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 20, y: 70 },
       data: {
@@ -277,13 +288,13 @@ const HE_NODES: GameNode[] = [
     },
     {
       id: 'supreme_court',
-      title: 'בית המשפט - בג"ץ "קול העם"',
+      title: '7. בית המשפט',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 50, y: 85 },
       data: {
-        description: 'המשחק מגיע לשיא: אתם עכשיו שופטי בג"ץ. העיתון עתר נגד שר הפנים.',
+        description: 'אתם עכשיו שופטי בג"ץ. העיתון עתר נגד שר הפנים.',
         backgroundImage: IMG.COURT,
         dialog: [
           { id: '1', speaker: 'נציג הממשלה', text: 'המדינה חייבת לשמור על ביטחון הציבור. המאמר הזה עלול לגרום למהומות.', mood: 'neutral' },
@@ -302,9 +313,9 @@ const HE_NODES: GameNode[] = [
     },
     {
       id: 'quiz_finale',
-      title: 'פיצוח הקוד הסופי',
+      title: '8. פיצוח הקוד',
       type: NodeType.QUIZ,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 85, y: 70 },
       data: {
@@ -380,11 +391,11 @@ const AR_NODES: GameNode[] = [
     },
     {
       id: 'school_lior',
-      title: 'المدرسة - خيار أمير',
+      title: '1. خيار أمير',
       type: NodeType.SCENARIO,
       isLocked: false,
       isCompleted: false,
-      coordinates: { x: 15, y: 20 },
+      coordinates: { x: 15, y: 28 },
       data: {
         description: 'يكتشف أمير أن في مبنى مدرسته تصدّعات خطيرة في السقف، مع احتماليّة مؤكّدة لحدوث انهيار. أبلغ المدير، لكن المدير قال: "لا توجد ميزانيّة للإصلاحات الآن".',
         backgroundImage: IMG.SCHOOL_LIOR,
@@ -404,10 +415,10 @@ const AR_NODES: GameNode[] = [
         },
         decisionQuestion: 'على أمير اتّخاذ قرار: كيف سيحمي حقّ طلاب المدرسة في الحياة والأمن الشخصيّ؟',
         options: [
-          { id: 'opt1', text: 'توثيق التصدّعات والتواصل مع وزارة التعليم', feedback: 'الفضيلة: التواصل مع مسؤول كبير ملتزم بالسلامة. النقيصة: قد تكون العمليّة بطيئة.' },
-          { id: 'opt2', text: 'الانتظام مع طلّاب آخرين والتوقيع على عريضة', feedback: 'الفضيلة: قوّة المجموعة تُولّد ضغطًا. النقيصة: قد يغضب المدير أو يتجاهل.' },
-          { id: 'opt3', text: 'الاتصال بأولياء الأمور وإبلاغهم بالخطر', feedback: 'الفضيلة: يمكن لأولياء الأمور التصرّف بسرعة. النقيصة: قد يُؤدّي ذلك إلى صراع.' },
-          { id: 'opt4', text: 'عدم القيام بأيّ شيء', feedback: 'الفضيلة: لا أحد ينزعج. النقيصة: يبقى الخطر قائمًا، وقد يقع حادث.' }
+          { id: 'opt1', text: 'توثيق التصدّعات والتواصل مع وزارة التعليم أو السلطة المحلية.', feedback: 'الفضيلة: التواصل مع مسؤول كبير ملتزم بالسلامة. النقيصة: قد تكون العمليّة بطيئة.' },
+          { id: 'opt2', text: 'تنظيم الطلاب وتوقيع عريضة وتقديمها للمدير.', feedback: 'الفضيلة: قوّة المجموعة تُولّد ضغطًا. النقيصة: قد يغضب المدير أو يتجاهل.' },
+          { id: 'opt3', text: 'الاتصال بأولياء الأمور وإبلاغهم بالخطر.', feedback: 'الفضيلة: يمكن لأولياء الأمور التصرّف بسرعة وتأثيرهم قوي. النقيصة: قد يُؤدّي ذلك إلى صراع بين الأهل والمدرسة.' },
+          { id: 'opt4', text: 'عدم القيام بأيّ شيء - "ربما التشققات ليست خطيرة جداً".', feedback: 'الفضيلة: لا أحد ينزعج. النقيصة: يبقى الخطر قائمًا، وقد يقع حادث.' }
         ],
         moreInfoTitle: 'الحق في الحياة والأمن',
         moreInfoContent: 'في الحالات التي يكون فيها خطر حقّيقيّ على الحياة أو السلامة الشخصيّة، يكون اتّخاذ إجراء سريع أمرًا ضروريًّا. عندما يتعلّق الأمر بالسلامة، فإن الوقت عامل يُنقذ الحياة. الاستجابة السريعة هي الفرق بين الحادث وبين الوقاية.'
@@ -415,11 +426,11 @@ const AR_NODES: GameNode[] = [
     },
     {
       id: 'town_square',
-      title: 'ساحة المدينة - حماية الحيّز',
+      title: '2. حماية الحيّز',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true,
       isCompleted: false,
-      coordinates: { x: 50, y: 50 },
+      coordinates: { x: 35, y: 65 },
       data: {
         description: 'الهدف: تحديد حالات انتهاك السلامة الشخصيّة واختيار الإجراءات. استخدم "الدرع" فقط في المواقف التي تُمثل انتهاكًا للسلامة الشخصيّة.',
         backgroundImage: IMG.TOWN_SQUARE,
@@ -441,11 +452,11 @@ const AR_NODES: GameNode[] = [
     },
     {
       id: 'city_hall',
-      title: 'البلدية - المدينة التي تصوّر كلّ شيء',
+      title: '3. البلدية',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true,
       isCompleted: false,
-      coordinates: { x: 50, y: 15 },
+      coordinates: { x: 50, y: 25 },
       data: {
         description: 'تواجه مدينة "واحة الضوء" زيادة في الجريمة. يفكّر رئيس البلدية في تركيب كاميرات ذكيّة (AI). يطلب منك كمستشار حقوق الإنسان مساعدته في القرار.',
         backgroundImage: IMG.CITY_HALL,
@@ -461,7 +472,7 @@ const AR_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_SQUARE,
             dialog: [
               { id: '1', speaker: 'مواطن مُسنّ', text: 'من قبل، كنت أخشى مغادرة المنزل ليلًا. منذ أن ركّبوا الكاميرات، أشعر بالأمان أخيرًا. في حال كان هناك مجرم، فسيتمّ القبض عليه فورًا.', mood: 'happy' },
-              { id: '2', speaker: 'الراوي', text: 'إشارة للطالب: يشمل الحقّ في الأمن الشخصيّ الحماية من المخاطر والأذى الجسديّ والنفسيّ.', mood: 'neutral' }
+              { id: '2', speaker: 'معلومة', text: 'إشارة للطالب: يشمل الحقّ في الأمن الشخصيّ الحماية من المخاطر والأذى الجسديّ والنفسيّ.', mood: 'neutral' }
             ]
           },
           {
@@ -471,7 +482,7 @@ const AR_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_CAFE,
             dialog: [
               { id: '1', speaker: 'شابّة', text: 'أنا لا أفعل شيئًا خاطئًا، لكنني أشعر دائمًا وكأن أحدهم يراقبني. كلّ حركة أقوم بها تُسجَّل. هذا ليس شعورًا بالحرّيّة.', mood: 'concerned' },
-              { id: '2', speaker: 'الراوي', text: 'إشارة للطالب: الحقّ في الخصوصيّة يحمي الشخص من المراقبة والتطفّل على حياته الشخصيّة.', mood: 'neutral' }
+              { id: '2', speaker: 'معلومة', text: 'إشارة للطالب: الحقّ في الخصوصيّة يحمي الشخص من المراقبة والتطفّل على حياته الشخصيّة.', mood: 'neutral' }
             ]
           },
           {
@@ -481,7 +492,7 @@ const AR_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_NEIGHBORHOOD,
             dialog: [
               { id: '1', speaker: 'فتى', text: 'لي صديق إثيوبيّ. يقول إنه في كلّ مرّة يمرّ فيها من أمام كاميرا، يخشى أن يظن "النظام" أنه مشتبه به.', mood: 'concerned' },
-              { id: '2', speaker: 'الراوي', text: 'إشارة للطالب: تقنيّة التعرّف على الوجه بالذكاء الاصطناعيّ ليست مثاليّة، وقد تُميِّز بسبب التحيّز.', mood: 'neutral' }
+              { id: '2', speaker: 'معلومة', text: 'إشارة للطالب: تقنيّة التعرّف على الوجه بالذكاء الاصطناعيّ ليست مثاليّة، وقد تُميِّز بسبب التحيّز.', mood: 'neutral' }
             ]
           },
           {
@@ -491,7 +502,7 @@ const AR_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_SCHOOL,
             dialog: [
               { id: '1', speaker: 'طالب', text: 'لو كان هناك عناصر شرطة يعرفوننا، مثل مراقبين من أبناء المجتمع، لشعرنا بأمان أكبر بدون كاميرات. الأمن يشمل من يستمع إليك.', mood: 'neutral' },
-              { id: '2', speaker: 'الراوي', text: 'إشارة للطالب: الأمن الحقّيقيّ يرتكز، أيضًا، على الثقة والتعاون بين المواطنين والدولة.', mood: 'neutral' }
+              { id: '2', speaker: 'معلومة', text: 'إشارة للطالب: الأمن الحقّيقيّ يرتكز، أيضًا، على الثقة والتعاون بين المواطنين والدولة.', mood: 'neutral' }
             ]
           }
         ],
@@ -502,15 +513,25 @@ const AR_NODES: GameNode[] = [
           { id: '3', text: 'دمج الكاميرات الخاضعة للإشراف مع الشرطة', feedback: 'تُوضع الكاميرات في مناطق الخطر فقط تحت إشراف. تنخفض الجريمة، ويبقى الشعور بالحرّيّة. التوازن يخلق أمنًا حقيقيًّا.' }
         ],
         moreInfoTitle: 'التوازن المناسب',
-        moreInfoContent: 'لا يُلغي الأمن العام تلقائيًا الحقّ في الخصوصيّة. استخدام الكاميرات يجب أن يكون للغرض المناسب (منع جريمة)، بالتناسب (أقل الوسائل مسًا بالخصوصيّة)، مع تقييد الاستخدام والشفافية.'
+        moreInfoContent: `يتطلب التوازن السليم بين الحق في الأمن الشخصي والحق في الخصوصية فحص تناسب وضرورة استخدام وسائل المراقبة.
+
+كلا الحقين هما حقان أساسيان معترف بهما في القانون الإسرائيلي، ومرسخان في أحكام المحكمة العليا وفي قانون أساس: كرامة الإنسان وحريته.
+من ناحية، تقع على عاتق الدولة مسؤولية حماية حياة مواطنيها والحفاظ على أمنهم؛ ومن ناحية أخرى، يحمي الحق في الخصوصية الإنسان من التدخل في حيز حياته الشخصية والمراقبة غير المعقولة من قبل السلطة.
+لذلك، لا يمكن تبرير استخدام الكاميرات الذكية والتعرف على الوجه إلا إذا استوفى المبادئ التالية:
+غاية مناسبة – المراقبة تهدف لمنع جريمة فعلية أو خطر أمني وليس للاستخدام العام أو السياسي.
+التناسب – يجب استخدام الوسيلة الأقل ضرراً قدر الإمكان (على سبيل المثال، تشويش وجوه الأشخاص غير المشتبه بهم).
+تقييد الاستخدام – سيتم حفظ المعلومات فقط للوقت اللازم للغرض الذي جمعت من أجله ولن يتم نقلها إلى جهات غير مصرح لها.
+الرقابة والشفافية – مطلوب آلية رقابة مستقلة وتقديم تقارير للجمهور حول نطاق استخدام الكاميرات.
+بكلمات أخرى، الأمن العام لا يتغلب تلقائياً على الحق في الخصوصية، بل فقط بالقدر اللازم والمتناسب للحفاظ الحقيقي على السلامة العامة، مع الحفاظ على قيم الديمقراطية وحقوق الإنسان.`
       }
     },
     {
       id: 'intro_freedom_speech',
-      title: 'مقدمة - صوتي',
+      title: '4. صوتي',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
+      coordinates: { x: 72, y: 56 },
       data: {
         description: 'المهمة: تفجير البالونات التي تُجسّد انتهاكًا لحرّيّة التعبير فقط.',
         backgroundImage: IMG.FREEDOM_INTRO, 
@@ -532,11 +553,11 @@ const AR_NODES: GameNode[] = [
     },
     {
       id: 'school_tamara',
-      title: 'المدرسة - ربى',
+      title: '5. ربى',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 85, y: 20 },
+      coordinates: { x: 85, y: 28 },
       data: {
         description: 'كتبت ربى، طالبة في الصف العاشر، منشورًا على فيسبوك تنتقد فيه بشدّة المديرة التي ألغت مجلس الطلّاب، ووصفتها بـ"الديكتاتورية".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -554,9 +575,9 @@ const AR_NODES: GameNode[] = [
         interactionType: InteractionType.NONE,
         decisionQuestion: 'ما الذي ينبغي أن يحدث؟',
         options: [
-          { id: '1', text: 'إبعاد ربى فورًا عن التعليم!', feedback: 'رد فعل مبالغ فيه. للطلاب الحق في حرية التعبير.' },
-          { id: '2', text: 'يُمكن لربى انتقاد القرار، لكن بصياغة غير مُهينة', feedback: 'صحيح. حرّيّة التعبير مهمّة ولكنها ليست مُطلقة. يجب الحفاظ على الكرامة.' },
-          { id: '3', text: 'يُمكن لربى كتابة ما تشاء', feedback: 'غير دقيق. حرّيّة التعبير لا تسمح بالتشهير.' }
+          { id: '1', text: 'إبعاد ربى فورًا عن التعليم! - لا يمكنك وصف المديرة بـ "الديكتاتورية" علنًا.', feedback: 'رد فعل مبالغ فيه. للطلاب الحق في حرية التعبير.' },
+          { id: '2', text: 'يُمكن لربى انتقاد القرار، لكن عليها التغيير إلى صياغة نقدية غير مهينة.', feedback: 'صحيح. حرّيّة التعبير مهمّة ولكنها ليست مُطلقة. يجب الحفاظ على الكرامة.' },
+          { id: '3', text: 'يُمكن لربى كتابة ما تشاء - حرية التعبير مطلقة.', feedback: 'غير دقيق. حرّيّة التعبير لا تسمح بالتشهير.' }
         ],
         moreInfoTitle: 'حقوق الطالب',
         moreInfoContent: 'تمنح معاهدة حقوق الطفل وقانون الأساس الطلاب حرية التعبير والمشاركة. يُعدّ إلغاء مجلس الطلّاب انتهاكًا لقانون حقوق الطلاب (المادة 13).'
@@ -564,9 +585,9 @@ const AR_NODES: GameNode[] = [
     },
     {
       id: 'newspaper_office',
-      title: 'صحيفة "النبض"',
+      title: '6. صحيفة "النبض"',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 20, y: 70 },
       data: {
@@ -595,13 +616,13 @@ const AR_NODES: GameNode[] = [
     },
     {
       id: 'supreme_court',
-      title: 'المحكمة العليا',
+      title: '7. المحكمة العليا',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 50, y: 85 },
       data: {
-        description: 'تصل اللعبة إلى ذروتها: أنتم الآن قضاة المحكمة العليا. الصحيفة التمست ضد الوزير.',
+        description: 'أنتم الآن قضاة المحكمة العليا. التمست الصحيفة ضد وزير الداخلية.',
         backgroundImage: IMG.COURT,
         dialog: [
           { id: '1', speaker: 'ممثّل الحكومة', text: 'على الدولة حماية الأمن العام. قد يُسبّب هذا التقرير أعمال شغب.', mood: 'neutral' },
@@ -620,9 +641,9 @@ const AR_NODES: GameNode[] = [
     },
     {
       id: 'quiz_finale',
-      title: 'فكّ الشيفرة النهائية',
+      title: '8. فكّ الشيفرة',
       type: NodeType.QUIZ,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 85, y: 70 },
       data: {
@@ -698,11 +719,11 @@ const EN_NODES: GameNode[] = [
     },
     {
       id: 'school_lior',
-      title: 'School - Lior\'s Choice',
+      title: '1. Lior\'s Choice',
       type: NodeType.SCENARIO,
       isLocked: false,
       isCompleted: false,
-      coordinates: { x: 15, y: 20 },
+      coordinates: { x: 15, y: 28 },
       data: {
         description: 'Lior discovers that his school building has dangerous cracks in the ceiling, with a definite risk of collapse. He reports it to the principal, but the principal says: "There is no budget for repairs right now."',
         backgroundImage: IMG.SCHOOL_LIOR,
@@ -722,10 +743,10 @@ const EN_NODES: GameNode[] = [
         },
         decisionQuestion: 'Lior needs to make a decision: How will he protect the students\' Right to Life and Security?',
         options: [
-          { id: 'opt1', text: 'Document and contact the Ministry of Education', feedback: 'Contacting a higher authority is effective, but the process might be slow.' },
-          { id: 'opt2', text: 'Sign a petition with students', feedback: 'Group power creates pressure, but the principal might get angry or ignore it.' },
-          { id: 'opt3', text: 'Call parents and inform them', feedback: 'Parents can act quickly, but it might create severe conflict.' },
-          { id: 'opt4', text: 'Do nothing', feedback: 'The danger remains, and an accident might happen. This is not the way.' }
+          { id: 'opt1', text: 'Document the cracks and contact the Ministry of Education or local authority.', feedback: 'Advantage: Contacting a senior authority committed to safety. Disadvantage: The process might be slow.' },
+          { id: 'opt2', text: 'Organize with other students, sign a petition, and present it to the principal.', feedback: 'Advantage: Group power creates pressure. Disadvantage: The principal might get angry or ignore it.' },
+          { id: 'opt3', text: 'Call parents and inform them about the danger.', feedback: 'Advantage: Parents can act quickly and are often influential. Disadvantage: It might create conflict between parents and the school.' },
+          { id: 'opt4', text: 'Do nothing – "Maybe the cracks aren\'t that dangerous."', feedback: 'Advantage: No one gets annoyed. Disadvantage: The danger remains, and an accident might happen.' }
         ],
         moreInfoTitle: 'Right to Life and Security',
         moreInfoContent: 'In situations where there is a real danger to life or personal security, quick action is essential. When it comes to safety, time is a life-saving factor. Quick response makes the difference between an accident and prevention.'
@@ -733,11 +754,11 @@ const EN_NODES: GameNode[] = [
     },
     {
       id: 'town_square',
-      title: 'Town Square - Protecting Space',
+      title: '2. Protecting Space',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true,
       isCompleted: false,
-      coordinates: { x: 50, y: 50 },
+      coordinates: { x: 35, y: 65 },
       data: {
         description: 'Goal: Identify when a person\'s personal security is violated and choose what the state should do. Drag the "Shield" only to situations representing a violation of personal security.',
         backgroundImage: IMG.TOWN_SQUARE,
@@ -759,11 +780,11 @@ const EN_NODES: GameNode[] = [
     },
     {
       id: 'city_hall',
-      title: 'City Hall - The City That Films',
+      title: '3. The City That Films',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true,
       isCompleted: false,
-      coordinates: { x: 50, y: 15 },
+      coordinates: { x: 50, y: 25 },
       data: {
         description: 'Neve Or is dealing with rising crime. The Mayor is considering adding thousands of AI cameras with facial recognition. He asks you, the Human Rights Advisor, to talk to residents before making a recommendation.',
         backgroundImage: IMG.CITY_HALL,
@@ -779,7 +800,7 @@ const EN_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_SQUARE,
             dialog: [
               { id: '1', speaker: 'Elderly Resident', text: 'I used to be afraid to go out at night. Since they installed cameras, I finally feel safe. If there\'s a criminal, they catch him immediately.', mood: 'happy' },
-              { id: '2', speaker: 'Narrator', text: 'Hint: The right to personal security includes protection from danger and harm to body and life.', mood: 'neutral' }
+              { id: '2', speaker: 'Info', text: 'Hint: The right to personal security includes protection from danger and harm to body and life.', mood: 'neutral' }
             ]
           },
           {
@@ -789,7 +810,7 @@ const EN_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_CAFE,
             dialog: [
               { id: '1', speaker: 'Young Woman', text: 'I\'m not doing anything wrong, but I feel like someone is always watching me. Every move is recorded. That\'s not freedom.', mood: 'concerned' },
-              { id: '2', speaker: 'Narrator', text: 'Hint: The right to privacy protects a person from surveillance and intrusion into their personal life.', mood: 'neutral' }
+              { id: '2', speaker: 'Info', text: 'Hint: The right to privacy protects a person from surveillance and intrusion into their personal life.', mood: 'neutral' }
             ]
           },
           {
@@ -799,7 +820,7 @@ const EN_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_NEIGHBORHOOD,
             dialog: [
               { id: '1', speaker: 'Teenager', text: 'I have an Ethiopian friend. He says every time he passes a camera, he worries the system thinks he\'s a suspect.', mood: 'concerned' },
-              { id: '2', speaker: 'Narrator', text: 'Hint: AI facial recognition technology is not perfect and can discriminate due to bias.', mood: 'neutral' }
+              { id: '2', speaker: 'Info', text: 'Hint: AI facial recognition technology is not perfect and can discriminate due to bias.', mood: 'neutral' }
             ]
           },
           {
@@ -809,7 +830,7 @@ const EN_NODES: GameNode[] = [
             backgroundImage: IMG.CITY_HALL_SCHOOL,
             dialog: [
               { id: '1', speaker: 'Student', text: 'If we had police officers who knew us, like community officers, we\'d feel safer without cameras. Security is also about who listens to you.', mood: 'neutral' },
-              { id: '2', speaker: 'Narrator', text: 'Hint: Real security is also based on trust and cooperation between citizens and the state.', mood: 'neutral' }
+              { id: '2', speaker: 'Info', text: 'Hint: Real security is also based on trust and cooperation between citizens and the state.', mood: 'neutral' }
             ]
           }
         ],
@@ -820,15 +841,25 @@ const EN_NODES: GameNode[] = [
           { id: '3', text: 'Combine supervised cameras with community policing', feedback: 'Cameras placed only in high-risk areas, under supervision. Crime drops, freedom preserved. Balance creates real security.' }
         ],
         moreInfoTitle: 'The Proper Balance',
-        moreInfoContent: 'The proper balance between personal security and privacy requires a proportionality test. Both rights are anchored in Basic Law: Human Dignity and Liberty.\n\nPrinciples for camera use:\n• Proper purpose – preventing crime, not political tracking.\n• Proportionality – minimum necessary use.\n• Usage limitation – info not passed to unauthorized parties.\n• Supervision and transparency.'
+        moreInfoContent: `The proper balance between the right to personal security and the right to privacy requires an examination of the proportionality and necessity of using surveillance measures.
+
+Both rights are fundamental rights recognized in Israeli law, anchored in Supreme Court rulings and Basic Law: Human Dignity and Liberty.
+On one hand, the state has a responsibility to protect the lives of its citizens and maintain their security; on the other hand, the right to privacy protects a person from intrusion into their personal life space and unreasonable surveillance by the authorities.
+Therefore, the use of smart cameras and facial recognition can only be justified if it meets the following principles:
+Proper Purpose – Surveillance is intended to prevent actual crime or security danger, not for general or political use.
+Proportionality – The least intrusive means possible must be used (for example, blurring the faces of people who are not suspects).
+Limitation of Use – Information will be kept only for the time necessary for the purpose for which it was collected and will not be transferred to unauthorized parties.
+Supervision and Transparency – An independent oversight mechanism and public reporting on the scope of camera use are required.
+In other words, public security does not automatically override the right to privacy, but only to the extent necessary and proportional for maintaining genuine public peace, while preserving democratic values and human rights.`
       }
     },
     {
       id: 'intro_freedom_speech',
-      title: 'Intro - My Voice',
+      title: '4. My Voice',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
+      coordinates: { x: 72, y: 56 },
       data: {
         description: 'Mission: Pop only the balloons that show a violation of Freedom of Speech!',
         backgroundImage: IMG.FREEDOM_INTRO, 
@@ -850,11 +881,11 @@ const EN_NODES: GameNode[] = [
     },
     {
       id: 'school_tamara',
-      title: 'School - Tamara',
+      title: '5. Tamara',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 85, y: 20 },
+      coordinates: { x: 85, y: 28 },
       data: {
         description: 'Tamara, a 10th grade student, writes a Facebook post against the principal who cancelled the Student Council without consultation. She calls her a "Dictator".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -872,9 +903,9 @@ const EN_NODES: GameNode[] = [
         interactionType: InteractionType.NONE,
         decisionQuestion: 'What should happen now?',
         options: [
-          { id: '1', text: 'Suspend Tamara immediately!', feedback: 'Too harsh. Students have a right to freedom of speech.' },
-          { id: '2', text: 'Tamara can criticize, but change wording', feedback: 'Correct. Freedom of speech is important but not absolute. Human dignity must be maintained.' },
-          { id: '3', text: 'Tamara can write whatever she wants', feedback: 'Inaccurate. Freedom of speech does not permit defamation.' }
+          { id: '1', text: 'Suspend Tamara immediately! - You can\'t call the principal a "dictator" publicly.', feedback: 'Too harsh. Students have a right to freedom of speech.' },
+          { id: '2', text: 'Tamara can criticize the decision, but needs to change to critical wording that isn\'t insulting.', feedback: 'Correct. Freedom of speech is important but not absolute. Human dignity must be maintained.' },
+          { id: '3', text: 'Tamara can write whatever she wants - freedom of speech is absolute.', feedback: 'Inaccurate. Freedom of speech does not permit defamation.' }
         ],
         moreInfoTitle: 'Student Rights',
         moreInfoContent: 'The Convention on the Rights of the Child and Basic Laws grant students freedom of speech and participation. Cancelling a student council contradicts the Student Rights Law (Section 13), which states an institution will encourage a council.'
@@ -882,9 +913,9 @@ const EN_NODES: GameNode[] = [
     },
     {
       id: 'newspaper_office',
-      title: 'The Pulse Newspaper',
+      title: '6. The Pulse',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 20, y: 70 },
       data: {
@@ -913,13 +944,13 @@ const EN_NODES: GameNode[] = [
     },
     {
       id: 'supreme_court',
-      title: 'Supreme Court - Kol HaAm',
+      title: '7. The Court',
       type: NodeType.SCENARIO,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 50, y: 85 },
       data: {
-        description: 'The game reaches its peak: You are now Supreme Court judges. The newspaper petitioned against the Minister.',
+        description: 'You are now Supreme Court judges. The newspaper petitioned against the Minister of Interior.',
         backgroundImage: IMG.COURT,
         dialog: [
           { id: '1', speaker: 'Govt Rep', text: 'The state must protect public security. This article could cause riots.', mood: 'neutral' },
@@ -938,9 +969,9 @@ const EN_NODES: GameNode[] = [
     },
     {
       id: 'quiz_finale',
-      title: 'Cracking Final Code',
+      title: '8. Cracking Code',
       type: NodeType.QUIZ,
-      isLocked: false,
+      isLocked: true, // LOCKED
       isCompleted: false,
       coordinates: { x: 85, y: 70 },
       data: {
@@ -995,4 +1026,3 @@ export const getInitialNodes = (lang: Language): GameNode[] => {
 };
 
 export const INITIAL_NODES = getInitialNodes('he');
-

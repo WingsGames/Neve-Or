@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { getInitialNodes, STORAGE_KEY } from './constants';
 import { GameState, NodeType, Language } from './types';
@@ -391,6 +392,7 @@ const App: React.FC = () => {
            language={language} 
            onLanguageChange={handleLanguageChange} 
            onOpenDevMode={() => setState(s => ({...s, devMode: true}))}
+           onBackToIntro={() => setState(s => ({...s, currentNodeId: null}))}
          />
        ) : activeNode ? (
          <SceneEngine 

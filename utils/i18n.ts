@@ -1,3 +1,5 @@
+
+
 import { Language } from '../types';
 
 export const translations = {
@@ -41,7 +43,7 @@ export const translations = {
     locations: 'מוקדים',
     
     // Mini-games instructions
-    balloonsInst: '🎈 פוצצו את הבלונים עם האמירות האסורות!',
+    balloonsInst: '🎈 פוצצו רק את הבלונים שמראים פגיעה בחופש הביטוי!',
     shieldInst: '🛡️ הגנו על מי שביטחונו נפגע!',
     
     // Feedback
@@ -90,7 +92,7 @@ export const translations = {
     visitMore: 'Visit',
     locations: 'more locations',
     
-    balloonsInst: '🎈 Pop forbidden balloons!',
+    balloonsInst: '🎈 Pop only the balloons that show a violation of Freedom of Speech!',
     shieldInst: '🛡️ Protect the vulnerable!',
     
     yourChoice: 'Your Choice:',
@@ -137,7 +139,7 @@ export const translations = {
     visitMore: 'قم بزيارة',
     locations: 'مواقع أخرى',
     
-    balloonsInst: '🎈 فرقع البالونات التي تحتوي على عبارات محظورة!',
+    balloonsInst: '🎈 فجروا فقط البالونات التي تظهر انتهاكاً لحرية التعبير!',
     shieldInst: '🛡️ احمِ من تضرر أمنه الشخصي!',
     
     yourChoice: 'اختيارك:',
