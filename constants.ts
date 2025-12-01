@@ -1,29 +1,26 @@
 
+
 import { GameNode, NodeType, InteractionType, Language } from './types';
 
 // CENTRALIZED STORAGE KEY
 // Bump version to force reset for new content
-export const STORAGE_KEY = 'neve_or_game_state_v10_local';
+export const STORAGE_KEY = 'neve_or_game_state_v9';
 
-// --- IMAGES (Now served locally from GitHub Pages to avoid Firebase Bandwidth costs) ---
-// Instructions for deployment:
-// 1. Create a folder named 'assets' inside your 'public' folder.
-// 2. Download the images and rename them exactly as they appear below.
-// NOTE: Paths must be relative (no leading slash) to work on GitHub Pages subdirectories.
+// --- IMAGES (Reusing existing assets where applicable) ---
 const IMG = {
-  INTRO: 'assets/intro.jpg',
-  HUB: 'assets/hub.jpg',
-  SCHOOL_LIOR: 'assets/school_lior.jpg',
-  TOWN_SQUARE: 'assets/town_square.jpg',
-  CITY_HALL: 'assets/city_hall.jpg',
-  CITY_HALL_SQUARE: 'assets/city_hall_square.jpg',
-  CITY_HALL_CAFE: 'assets/city_hall_cafe.jpg',
-  CITY_HALL_NEIGHBORHOOD: 'assets/city_hall_neighborhood.jpg',
-  CITY_HALL_SCHOOL: 'assets/city_hall_school.jpg',
-  FREEDOM_INTRO: 'assets/freedom_intro.jpg',
-  SCHOOL_TAMARA: 'assets/school_tamara.jpg',
-  NEWSPAPER: 'assets/newspaper.jpg',
-  COURT: 'assets/court.jpg',
+  INTRO: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fintro_1763671828771.jpg?alt=media&v=1',
+  HUB: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2FHUB_CONFIG_1764050216796.jpg?alt=media&v=1',
+  SCHOOL_LIOR: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fschool_lior_1764137954179.jpg?alt=media&v=1',
+  TOWN_SQUARE: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Ftown_square_1764149894637.jpg?alt=media&v=1',
+  CITY_HALL: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_1764066495586.jpg?alt=media&v=1',
+  CITY_HALL_SQUARE: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_square_1764149964367.jpg?alt=media&v=1',
+  CITY_HALL_CAFE: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_cafe_1764066571901.jpg?alt=media&v=1',
+  CITY_HALL_NEIGHBORHOOD: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_neighborhood_1764066598597.jpg?alt=media&v=1',
+  CITY_HALL_SCHOOL: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_school_1764149991251.jpg?alt=media&v=1',
+  FREEDOM_INTRO: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_1764053740252.jpg?alt=media&v=1',
+  SCHOOL_TAMARA: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fschool_tamara_1764536588166.jpg?alt=media&v=1',
+  NEWSPAPER: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fnewspaper_office_1764152226500.jpg?alt=media&v=1',
+  COURT: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fsupreme_court_1764534551866.jpg?alt=media&v=1',
 };
 
 const HE_NODES: GameNode[] = [
@@ -668,20 +665,329 @@ const AR_NODES: GameNode[] = [
     }
 ];
 
+const EN_NODES: GameNode[] = [
+    {
+      id: 'HUB_CONFIG',
+      title: 'Map Settings',
+      type: NodeType.HUB,
+      isLocked: false,
+      isCompleted: false,
+      data: {
+        description: '',
+        backgroundImage: IMG.HUB,
+        dialog: [],
+        interactionType: InteractionType.NONE,
+        decisionQuestion: '',
+        options: []
+      }
+    },
+    {
+      id: 'intro',
+      title: 'Intro - Neve Or',
+      type: NodeType.INTRO,
+      isLocked: false,
+      isCompleted: false,
+      data: {
+        description: 'Welcome to Neve Or, a digital city where every decision you make affects the lives of its residents. Here you will discover that human rights are not always easily realized. Throughout the game, you will step into the shoes of students, journalists, and judges. Your choices will determine if a right is protected, violated, or balanced properly. There is no "perfect solution" – only responsibility and critical thinking. Will you manage to find the balance?',
+        backgroundImage: IMG.INTRO,
+        decisionQuestion: 'Will you manage to find the balance?',
+        options: [{ id: 'start', text: 'Start Game', feedback: 'The game begins now.' }],
+        dialog: [],
+        interactionType: InteractionType.NONE
+      }
+    },
+    {
+      id: 'school_lior',
+      title: 'School - Lior\'s Choice',
+      type: NodeType.SCENARIO,
+      isLocked: false,
+      isCompleted: false,
+      coordinates: { x: 15, y: 20 },
+      data: {
+        description: 'Lior discovers that his school building has dangerous cracks in the ceiling, with a definite risk of collapse. He reports it to the principal, but the principal says: "There is no budget for repairs right now."',
+        backgroundImage: IMG.SCHOOL_LIOR,
+        dialog: [
+           { id: '1', speaker: 'Lior', text: 'Principal, the ceiling is crumbling! It\'s really dangerous.', mood: 'concerned' },
+           { id: '2', speaker: 'Principal', text: 'I know, but there is no budget for repairs at the moment. It will be fine.', mood: 'neutral' }
+        ],
+        interactionType: InteractionType.MULTIPLE_CHOICE,
+        interactionData: {
+          question: 'Which right is being violated here?',
+          answers: [
+            { id: '1', text: 'Right to Education', correct: false },
+            { id: '2', text: 'Right to Life and Personal Security', correct: true },
+            { id: '3', text: 'Freedom of Speech', correct: false },
+            { id: '4', text: 'Right to Privacy', correct: false }
+          ]
+        },
+        decisionQuestion: 'Lior needs to make a decision: How will he protect the students\' Right to Life and Security?',
+        options: [
+          { id: 'opt1', text: 'Document and contact the Ministry of Education', feedback: 'Contacting a higher authority is effective, but the process might be slow.' },
+          { id: 'opt2', text: 'Sign a petition with students', feedback: 'Group power creates pressure, but the principal might get angry or ignore it.' },
+          { id: 'opt3', text: 'Call parents and inform them', feedback: 'Parents can act quickly, but it might create severe conflict.' },
+          { id: 'opt4', text: 'Do nothing', feedback: 'The danger remains, and an accident might happen. This is not the way.' }
+        ],
+        moreInfoTitle: 'Right to Life and Security',
+        moreInfoContent: 'In situations where there is a real danger to life or personal security, quick action is essential. When it comes to safety, time is a life-saving factor. Quick response makes the difference between an accident and prevention.'
+      }
+    },
+    {
+      id: 'town_square',
+      title: 'Town Square - Protecting Space',
+      type: NodeType.SCENARIO,
+      isLocked: false,
+      isCompleted: false,
+      coordinates: { x: 50, y: 50 },
+      data: {
+        description: 'Goal: Identify when a person\'s personal security is violated and choose what the state should do. Drag the "Shield" only to situations representing a violation of personal security.',
+        backgroundImage: IMG.TOWN_SQUARE,
+        dialog: [],
+        interactionType: InteractionType.DRAG_SHIELD,
+        interactionData: {
+          items: [
+            { id: '1', text: 'Child threatened online', isDanger: true },
+            { id: '2', text: 'Person walking innocently', isDanger: false },
+            { id: '3', text: 'Person attacked on street', isDanger: true },
+            { id: '4', text: 'Citizen talking to police', isDanger: false }
+          ]
+        },
+        decisionQuestion: 'Did you protect everyone?',
+        options: [{ id: 'ok', text: 'Continue', feedback: 'Personal security is not a luxury – it is a basic right that every state must guarantee.' }],
+        moreInfoTitle: 'Personal Security',
+        moreInfoContent: 'The right to personal security includes: protection from violence, assault or threat, maintaining privacy, and preventing physical and mental harm. This is the state\'s responsibility.'
+      }
+    },
+    {
+      id: 'city_hall',
+      title: 'City Hall - The City That Films',
+      type: NodeType.SCENARIO,
+      isLocked: false,
+      isCompleted: false,
+      coordinates: { x: 50, y: 15 },
+      data: {
+        description: 'Neve Or is dealing with rising crime. The Mayor is considering adding thousands of AI cameras with facial recognition. He asks you, the Human Rights Advisor, to talk to residents before making a recommendation.',
+        backgroundImage: IMG.CITY_HALL,
+        dialog: [
+          { id: '1', speaker: 'Mayor', text: 'I want you to talk to three residents and hear how they feel. Only then recommend what is right.', mood: 'neutral' }
+        ],
+        interactionType: InteractionType.CITY_HALL_SUB_LOCATIONS,
+        subScenes: [
+          {
+            id: 'sub_square',
+            title: 'Central Square',
+            icon: '⛲',
+            backgroundImage: IMG.CITY_HALL_SQUARE,
+            dialog: [
+              { id: '1', speaker: 'Elderly Resident', text: 'I used to be afraid to go out at night. Since they installed cameras, I finally feel safe. If there\'s a criminal, they catch him immediately.', mood: 'happy' },
+              { id: '2', speaker: 'Narrator', text: 'Hint: The right to personal security includes protection from danger and harm to body and life.', mood: 'neutral' }
+            ]
+          },
+          {
+            id: 'sub_cafe',
+            title: 'Coffee Shop',
+            icon: '☕',
+            backgroundImage: IMG.CITY_HALL_CAFE,
+            dialog: [
+              { id: '1', speaker: 'Young Woman', text: 'I\'m not doing anything wrong, but I feel like someone is always watching me. Every move is recorded. That\'s not freedom.', mood: 'concerned' },
+              { id: '2', speaker: 'Narrator', text: 'Hint: The right to privacy protects a person from surveillance and intrusion into their personal life.', mood: 'neutral' }
+            ]
+          },
+          {
+            id: 'sub_neighborhood',
+            title: 'Neighborhood',
+            icon: '🏘️',
+            backgroundImage: IMG.CITY_HALL_NEIGHBORHOOD,
+            dialog: [
+              { id: '1', speaker: 'Teenager', text: 'I have an Ethiopian friend. He says every time he passes a camera, he worries the system thinks he\'s a suspect.', mood: 'concerned' },
+              { id: '2', speaker: 'Narrator', text: 'Hint: AI facial recognition technology is not perfect and can discriminate due to bias.', mood: 'neutral' }
+            ]
+          },
+          {
+            id: 'sub_school',
+            title: 'School',
+            icon: '🏫',
+            backgroundImage: IMG.CITY_HALL_SCHOOL,
+            dialog: [
+              { id: '1', speaker: 'Student', text: 'If we had police officers who knew us, like community officers, we\'d feel safer without cameras. Security is also about who listens to you.', mood: 'neutral' },
+              { id: '2', speaker: 'Narrator', text: 'Hint: Real security is also based on trust and cooperation between citizens and the state.', mood: 'neutral' }
+            ]
+          }
+        ],
+        decisionQuestion: 'What is the solution that ensures real security for Neve Or residents?',
+        options: [
+          { id: '1', text: 'Install smart cameras everywhere', feedback: 'Crime drops, but residents feel they lost their freedom. Physical security achieved, but privacy harmed.' },
+          { id: '2', text: 'Invest in community policing', feedback: 'Social security rises and community connection improves, but technological protection is missing.' },
+          { id: '3', text: 'Combine supervised cameras with community policing', feedback: 'Cameras placed only in high-risk areas, under supervision. Crime drops, freedom preserved. Balance creates real security.' }
+        ],
+        moreInfoTitle: 'The Proper Balance',
+        moreInfoContent: 'The proper balance between personal security and privacy requires a proportionality test. Both rights are anchored in Basic Law: Human Dignity and Liberty.\n\nPrinciples for camera use:\n• Proper purpose – preventing crime, not political tracking.\n• Proportionality – minimum necessary use.\n• Usage limitation – info not passed to unauthorized parties.\n• Supervision and transparency.'
+      }
+    },
+    {
+      id: 'intro_freedom_speech',
+      title: 'Intro - My Voice',
+      type: NodeType.SCENARIO,
+      isLocked: false,
+      isCompleted: false,
+      data: {
+        description: 'Mission: Pop only the balloons that show a violation of Freedom of Speech!',
+        backgroundImage: IMG.FREEDOM_INTRO, 
+        dialog: [],
+        interactionType: InteractionType.BALLOONS,
+        interactionData: {
+          items: [
+            { id: '1', text: 'Allowed to express unpopular opinion', isCorrect: false },
+            { id: '2', text: 'Forbidden to speak against government', isCorrect: true },
+            { id: '3', text: 'Forbidden to criticize institutions', isCorrect: true },
+            { id: '4', text: 'Allowed to write review in newspaper', isCorrect: false }
+          ]
+        },
+        decisionQuestion: 'Mission Complete',
+        options: [{ id: 'ok', text: 'Continue', feedback: 'Your voice matters – protect it, use it responsibly. Freedom of speech is not absolute, but it is a fundamental right.' }],
+        moreInfoTitle: 'Freedom of Speech',
+        moreInfoContent: 'Freedom of speech includes the right to express an opinion, criticize, publish information, and demonstrate. Restrictions are allowed only when the expression endangers life or harms other rights disproportionately.'
+      }
+    },
+    {
+      id: 'school_tamara',
+      title: 'School - Tamara',
+      type: NodeType.SCENARIO,
+      isLocked: false,
+      isCompleted: false,
+      coordinates: { x: 85, y: 20 },
+      data: {
+        description: 'Tamara, a 10th grade student, writes a Facebook post against the principal who cancelled the Student Council without consultation. She calls her a "Dictator".',
+        backgroundImage: IMG.SCHOOL_TAMARA,
+        digitalContent: {
+          type: 'POST',
+          author: 'Tamara',
+          content: 'Our principal is a dictator and hurts freedom of speech! Cancelled council without asking anyone. How are we supposed to learn democracy when we have no voice?',
+          likes: 150
+        },
+        dialog: [
+          { id: '1', speaker: 'Principal Cohen', text: 'Tamara, you called me a dictator in front of hundreds! This hurts my dignity and authority.', mood: 'angry' },
+          { id: '2', speaker: 'Tamara', text: 'But I have freedom of speech! I just expressed an opinion on a policy that hurts us.', mood: 'concerned' },
+          { id: '3', speaker: 'Teacher Danny', text: 'You are both partially right. Criticism is allowed, but "dictator" is a personal attack.', mood: 'neutral' }
+        ],
+        interactionType: InteractionType.NONE,
+        decisionQuestion: 'What should happen now?',
+        options: [
+          { id: '1', text: 'Suspend Tamara immediately!', feedback: 'Too harsh. Students have a right to freedom of speech.' },
+          { id: '2', text: 'Tamara can criticize, but change wording', feedback: 'Correct. Freedom of speech is important but not absolute. Human dignity must be maintained.' },
+          { id: '3', text: 'Tamara can write whatever she wants', feedback: 'Inaccurate. Freedom of speech does not permit defamation.' }
+        ],
+        moreInfoTitle: 'Student Rights',
+        moreInfoContent: 'The Convention on the Rights of the Child and Basic Laws grant students freedom of speech and participation. Cancelling a student council contradicts the Student Rights Law (Section 13), which states an institution will encourage a council.'
+      }
+    },
+    {
+      id: 'newspaper_office',
+      title: 'The Pulse Newspaper',
+      type: NodeType.SCENARIO,
+      isLocked: false,
+      isCompleted: false,
+      coordinates: { x: 20, y: 70 },
+      data: {
+        description: 'The "Pulse" newspaper published an article: "Government suppresses journalists and hides info". Interior Minister ordered to close the paper for 10 days citing security.',
+        backgroundImage: IMG.NEWSPAPER,
+        digitalContent: {
+          type: 'ARTICLE',
+          title: 'The Pulse',
+          content: 'Exposure: Government suppresses independent journalists and hides critical info from the public.',
+          author: 'Editorial Board'
+        },
+        dialog: [
+          { id: '1', speaker: 'Editor', text: 'We got a closure notice! What do we do?', mood: 'concerned' },
+          { id: '2', speaker: 'Reporter', text: 'We must fight this. It\'s silencing us.', mood: 'angry' }
+        ],
+        interactionType: InteractionType.NONE,
+        decisionQuestion: 'How will the team respond?',
+        options: [
+          { id: '1', text: 'Post another angry post: "We won\'t be silenced!"', feedback: 'Might worsen the situation.' },
+          { id: '2', text: 'Petition the Supreme Court', feedback: 'Correct step. The democratic way to deal with a government decision.' },
+          { id: '3', text: 'Take down article and apologize', feedback: 'Surrender that hurts freedom of the press.' }
+        ],
+        moreInfoTitle: 'Freedom of the Press',
+        moreInfoContent: 'Freedom of the press is derived from freedom of speech. This case recalls the "Kol HaAm" affair (1953) where a closure order for a newspaper was cancelled.'
+      }
+    },
+    {
+      id: 'supreme_court',
+      title: 'Supreme Court - Kol HaAm',
+      type: NodeType.SCENARIO,
+      isLocked: false,
+      isCompleted: false,
+      coordinates: { x: 50, y: 85 },
+      data: {
+        description: 'The game reaches its peak: You are now Supreme Court judges. The newspaper petitioned against the Minister.',
+        backgroundImage: IMG.COURT,
+        dialog: [
+          { id: '1', speaker: 'Govt Rep', text: 'The state must protect public security. This article could cause riots.', mood: 'neutral' },
+          { id: '2', speaker: 'Editor', text: 'There is no real danger here, just criticism. In a democracy, criticism is allowed.', mood: 'neutral' }
+        ],
+        interactionType: InteractionType.NONE,
+        decisionQuestion: 'As judges, what is your ruling?',
+        options: [
+          { id: '1', text: 'Cancel order - Freedom of speech prevails', feedback: 'Correct. This is the principle established in the Kol HaAm High Court ruling (1953).' },
+          { id: '2', text: 'Approve order - Better prevent danger', feedback: 'This is a harsh approach rejected in historical rulings.' },
+          { id: '3', text: 'Reduce order duration', feedback: 'Still a disproportionate violation.' }
+        ],
+        moreInfoTitle: 'Near Certainty Test',
+        moreInfoContent: 'In the "Kol HaAm" ruling, the court stated: Freedom of speech must not be restricted unless there is "near certainty of real harm to state security".'
+      }
+    },
+    {
+      id: 'quiz_finale',
+      title: 'Cracking Final Code',
+      type: NodeType.QUIZ,
+      isLocked: false,
+      isCompleted: false,
+      coordinates: { x: 85, y: 70 },
+      data: {
+        description: 'Answer the questions to get the digits for the secret code and finish the game.',
+        dialog: [],
+        interactionType: InteractionType.CODE_CRACKER,
+        interactionData: {
+          questions: [
+            { 
+              id: 'q1', 
+              question: 'Year of Universal Declaration of Human Rights?', 
+              options: [{text: '1947', value: 0}, {text: '1967', value: 0}, {text: '1948', value: 3}, {text: '1946', value: 0}],
+              explanation: '1948 - The digit is 3'
+            },
+            { 
+              id: 'q2', 
+              question: 'Year Basic Law: Human Dignity and Liberty enacted?', 
+              options: [{text: '1996', value: 0}, {text: '1992', value: 2}, {text: '1987', value: 0}, {text: '1990', value: 0}],
+              explanation: '1992 - The digit is 2'
+            },
+            { 
+              id: 'q3', 
+              question: 'Israel is party to how many core HR treaties?', 
+              options: [{text: '9', value: 0}, {text: '5', value: 0}, {text: '8', value: 0}, {text: '7', value: 4}],
+              explanation: 'The digit is 4. Israel is party to 7 core treaties.'
+            },
+            { 
+              id: 'q4', 
+              question: 'Month of Int\'l Day Against Racism?', 
+              options: [{text: 'December', value: 0}, {text: 'March', value: 2}, {text: 'February', value: 0}, {text: 'August', value: 0}],
+              explanation: 'March - The digit is 2'
+            }
+          ]
+        },
+        decisionQuestion: 'Code Cracked!',
+        options: [], 
+        moreInfoTitle: 'Well Done!',
+        moreInfoContent: 'Human rights are fundamental rights ensuring everyone lives with dignity, freedom, and security. They allow us to live in a just society.\n\nIt is important to keep learning about human rights, understand the challenges, and fight for them to be realized for everyone – always, everywhere.'
+      }
+    }
+];
+
 const NODES_DATA = {
   he: HE_NODES,
   ar: AR_NODES,
-  en: [] // Placeholder
+  en: EN_NODES
 };
-
-const applyCoordinatesAndClone = () => {
-   // Clone HE nodes as a base for English to ensure structure matches
-   // @ts-ignore
-   NODES_DATA['en'] = JSON.parse(JSON.stringify(HE_NODES));
-   // Arabic is now manually defined above
-};
-
-applyCoordinatesAndClone();
 
 export const getInitialNodes = (lang: Language): GameNode[] => {
   const nodes = NODES_DATA[lang] && NODES_DATA[lang].length > 0 ? NODES_DATA[lang] : NODES_DATA['he'];
@@ -689,3 +995,4 @@ export const getInitialNodes = (lang: Language): GameNode[] => {
 };
 
 export const INITIAL_NODES = getInitialNodes('he');
+
