@@ -9,20 +9,21 @@ export const STORAGE_KEY = 'neve_or_game_state_v10_local';
 // Instructions for deployment:
 // 1. Create a folder named 'assets' inside your 'public' folder.
 // 2. Download the images and rename them exactly as they appear below.
+// NOTE: Paths must be relative (no leading slash) to work on GitHub Pages subdirectories.
 const IMG = {
-  INTRO: '/assets/intro.jpg',
-  HUB: '/assets/hub.jpg',
-  SCHOOL_LIOR: '/assets/school_lior.jpg',
-  TOWN_SQUARE: '/assets/town_square.jpg',
-  CITY_HALL: '/assets/city_hall.jpg',
-  CITY_HALL_SQUARE: '/assets/city_hall_square.jpg',
-  CITY_HALL_CAFE: '/assets/city_hall_cafe.jpg',
-  CITY_HALL_NEIGHBORHOOD: '/assets/city_hall_neighborhood.jpg',
-  CITY_HALL_SCHOOL: '/assets/city_hall_school.jpg',
-  FREEDOM_INTRO: '/assets/freedom_intro.jpg',
-  SCHOOL_TAMARA: '/assets/school_tamara.jpg',
-  NEWSPAPER: '/assets/newspaper.jpg',
-  COURT: '/assets/court.jpg',
+  INTRO: 'assets/intro.jpg',
+  HUB: 'assets/hub.jpg',
+  SCHOOL_LIOR: 'assets/school_lior.jpg',
+  TOWN_SQUARE: 'assets/town_square.jpg',
+  CITY_HALL: 'assets/city_hall.jpg',
+  CITY_HALL_SQUARE: 'assets/city_hall_square.jpg',
+  CITY_HALL_CAFE: 'assets/city_hall_cafe.jpg',
+  CITY_HALL_NEIGHBORHOOD: 'assets/city_hall_neighborhood.jpg',
+  CITY_HALL_SCHOOL: 'assets/city_hall_school.jpg',
+  FREEDOM_INTRO: 'assets/freedom_intro.jpg',
+  SCHOOL_TAMARA: 'assets/school_tamara.jpg',
+  NEWSPAPER: 'assets/newspaper.jpg',
+  COURT: 'assets/court.jpg',
 };
 
 const HE_NODES: GameNode[] = [
