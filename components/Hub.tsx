@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { GameNode, Language } from '../types';
 import { t } from '../utils/i18n';
@@ -18,6 +17,9 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
   const hubConfig = nodes.find(n => n.id === 'HUB_CONFIG');
   const backgroundImage = hubConfig?.data.backgroundImage;
   const [imgError, setImgError] = useState(false);
+  
+  // Safe access to DEV mode flag
+  const isDev = (import.meta as any).env?.DEV;
 
   // Filter out Intro and Hub Config, and nodes without coordinates (hidden scenarios)
   const activeNodes = nodes.filter(n => n.type !== 'INTRO' && n.type !== 'HUB' && n.coordinates);
@@ -56,10 +58,12 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
         <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
       </div>
 
-      {/* Dev Hint - Top Left (Safe Zone) */}
-      <div className="absolute top-2 left-2 z-50 text-[10px] text-white/50 font-mono hover:text-white transition-colors bg-black/20 px-2 py-1 rounded">
-         Dev: Ctrl+Shift+D
-      </div>
+      {/* Dev Hint - Top Left (Safe Zone) - ONLY IN DEVELOPMENT */}
+      {isDev && (
+        <div className="absolute top-2 left-2 z-50 text-[10px] text-white/50 font-mono hover:text-white transition-colors bg-black/20 px-2 py-1 rounded">
+           Dev: Ctrl+Shift+D
+        </div>
+      )}
 
       {/* Map Pins / Nodes Layer */}
       <div className="absolute inset-0 z-10">
