@@ -66,10 +66,18 @@ export interface SceneData {
   interactionType: InteractionType;
   interactionData?: any; // Flexible data for mini-games
   subScenes?: SubScene[]; // For City Hall style nested interactions
+  
+  // Phase 1 Decision
   decisionQuestion: string;
   options: DecisionOption[];
   moreInfoTitle?: string;
   moreInfoContent?: string; // For the Bottom Sheet
+
+  // Optional Phase 2 Decision (Chained Dilemma)
+  secondaryDecisionQuestion?: string;
+  secondaryOptions?: DecisionOption[];
+  secondaryMoreInfoTitle?: string;
+  secondaryMoreInfoContent?: string;
 }
 
 export interface GameNode {

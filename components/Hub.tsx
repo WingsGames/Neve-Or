@@ -1,11 +1,7 @@
 
-
-
-
 import React, { useState } from 'react';
 import { GameNode, Language } from '../types';
 import { t } from '../utils/i18n';
-import { LanguageSwitcher } from './ui/LanguageSwitcher';
 import { playSfx } from '../services/audioService';
 
 interface Props {
@@ -17,22 +13,16 @@ interface Props {
   onBackToIntro: () => void;
 }
 
-export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguageChange, onBackToIntro }) => {
-  // Find the HUB_CONFIG node to get the background image
+export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIntro, onOpenDevMode }) => {
   const hubConfig = nodes.find(n => n.id === 'HUB_CONFIG');
   const backgroundImage = hubConfig?.data.backgroundImage;
   const [imgError, setImgError] = useState(false);
-  
-  // Safe access to DEV mode flag
-  const isDev = (import.meta as any).env?.DEV;
-
-  // Filter out Intro and Hub Config, and nodes without coordinates (hidden scenarios)
   const activeNodes = nodes.filter(n => n.type !== 'INTRO' && n.type !== 'HUB' && n.coordinates);
 
   return (
     <div className="fixed inset-0 w-full h-full bg-slate-900 overflow-hidden font-sans select-none">
       
-      {/* Background Layer - Full Screen */}
+      {/* Background Layer */}
       <div className="absolute inset-0 z-0">
         {backgroundImage && !imgError ? (
            <img 
@@ -42,35 +32,32 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
              onError={() => setImgError(true)} 
            />
         ) : (
-           /* Stylish Vector Map Fallback */
            <div className="w-full h-full relative bg-[#f0f4f8]">
-             {/* Water */}
              <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-[#bfdbfe] rounded-tl-[100px] opacity-60"></div>
              <div className="absolute top-20 left-[-10%] w-1/3 h-20 bg-[#bfdbfe] -rotate-12 opacity-40"></div>
-             
-             {/* Roads Pattern */}
              <div className="absolute inset-0 opacity-10" 
                   style={{ backgroundImage: 'linear-gradient(#94a3b8 2px, transparent 2px), linear-gradient(90deg, #94a3b8 2px, transparent 2px)', backgroundSize: '60px 60px' }}>
              </div>
-             
-             {/* Label */}
              <div className="absolute bottom-4 right-4 text-slate-400 font-bold text-xs uppercase tracking-widest">
                 NOVE OR CITY MAP
              </div>
            </div>
         )}
-        {/* Subtle overlay to make UI elements pop */}
         <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
       </div>
 
-      {/* Dev Hint - Top Left (Safe Zone) - ONLY IN DEVELOPMENT */}
-      {isDev && (
-        <div className="absolute top-2 left-2 z-50 text-[10px] text-white/50 font-mono hover:text-white transition-colors bg-black/20 px-2 py-1 rounded">
-           Dev: Ctrl+Shift+D
-        </div>
-      )}
+      {/* Dev Mode Button (Always visible) */}
+      <button 
+        onClick={() => {
+           playSfx('click');
+           onOpenDevMode();
+        }}
+        className="absolute top-2 left-2 z-50 text-[10px] text-white/70 font-bold hover:text-white transition-all bg-black/30 px-3 py-1.5 rounded-full border border-white/10 hover:bg-black/50 hover:scale-105 active:scale-95 flex items-center gap-1.5 backdrop-blur-sm"
+      >
+         <span>🛠️</span> Dev Mode
+      </button>
 
-      {/* Back to Intro Button - Positioned safely - POLISHED */}
+      {/* Back to Intro Button */}
       <div className="absolute top-5 right-5 z-50">
         <button 
           onClick={() => {
@@ -84,13 +71,10 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
         </button>
       </div>
 
-      {/* Map Pins / Nodes Layer */}
+      {/* Map Pins */}
       <div className="absolute inset-0 z-10">
         {activeNodes.map((node, index) => {
           if (!node.coordinates) return null;
-          
-          // Smart Tooltip Positioning:
-          // If node is in the bottom 40% of the screen, show tooltip ABOVE the pin to avoid overlap with bottom UI
           const isBottom = node.coordinates.y > 60;
           const isActive = !node.isLocked && !node.isCompleted;
           
@@ -112,39 +96,33 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
                 disabled={node.isLocked}
                 className={`relative group/pin flex flex-col items-center transition-all duration-300 ${node.isLocked ? 'opacity-80 grayscale cursor-not-allowed' : 'hover:scale-110 cursor-pointer'}`}
               >
-                {/* Connection Line to Ground */}
                 <div className="hidden sm:block w-0.5 h-6 bg-black/30 absolute top-full left-1/2 -translate-x-1/2 origin-top transform scale-y-0 transition-transform duration-300 group-hover/pin:scale-y-100"></div>
-                <div className="hidden sm:block w-3 h-1 bg-black/40 rounded-full absolute top-[calc(100%+6px)] left-1/2 -translate-x-1/2 opacity-0 group-hover/pin:opacity-100 transition-opacity duration-300 blur-[2px]"></div>
-
-                {/* Number Badge - Smaller */}
+                
+                {/* Badge */}
                 <div className="absolute -top-2 -right-2 w-5 h-5 sm:w-7 sm:h-7 bg-yellow-400 text-blue-900 rounded-full border-[2px] border-white flex items-center justify-center font-black text-[10px] sm:text-xs shadow-md z-30 transform transition-transform group-hover/pin:rotate-12">
                   {index + 1}
                 </div>
                 
-                {/* NEW! Badge for Next Level */}
                 {isActive && (
                    <>
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white animate-bounce z-40 whitespace-nowrap">
                       {language === 'he' ? '!חדש' : 'New!'}
                     </div>
-                    {/* Ring Pulse */}
                     <div className="absolute inset-0 rounded-3xl ring-4 ring-blue-400 animate-ping opacity-50"></div>
                    </>
                 )}
 
-                {/* Pin Icon - Reduced Size */}
+                {/* Pin Icon */}
                 <div className={`w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl rotate-45 flex items-center justify-center shadow-2xl border-[3px] sm:border-[4px] border-white transition-all relative z-20 overflow-hidden
                   ${node.isCompleted ? 'bg-gradient-to-br from-green-400 to-green-600' : node.isLocked ? 'bg-gradient-to-br from-gray-400 to-gray-500' : 'bg-gradient-to-br from-blue-500 to-blue-700 hover:shadow-blue-500/50'}
                 `}>
                   <span className="-rotate-45 text-lg sm:text-3xl drop-shadow-md filter text-white">
                      {node.isCompleted ? '✓' : node.isLocked ? '🔒' : node.type === 'QUIZ' ? '🔑' : '📍'}
                   </span>
-                  
-                  {/* Shine effect */}
                   {!node.isLocked && <div className="absolute inset-0 bg-white/30 -skew-x-12 -translate-x-full group-hover/pin:animate-shine"></div>}
                 </div>
 
-                {/* Label (Tooltip style) - Smart Positioning */}
+                {/* Tooltip */}
                 <div className={`
                   absolute px-4 py-2 bg-white/95 backdrop-blur-md rounded-xl shadow-xl 
                   text-xs sm:text-sm font-bold text-gray-800 whitespace-nowrap opacity-0 
@@ -164,9 +142,7 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onLanguage
         })}
       </div>
       
-      {/* UI Controls - Positioned in BOTTOM CORNERS to avoid overlap with map pins */}
-
-      {/* Legend - Bottom Right - POLISHED */}
+      {/* Legend */}
       <div className="absolute bottom-6 right-6 z-40 flex items-center gap-3 sm:gap-4 bg-white/95 backdrop-blur px-5 py-2.5 rounded-full shadow-xl animate-fade-in-up">
         <LegendItem color="bg-blue-600" label={t('open', language)} />
         <div className="w-px h-4 bg-gray-200"></div>

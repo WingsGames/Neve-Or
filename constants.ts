@@ -1,30 +1,36 @@
-
-
-
-
-
-
 import { GameNode, NodeType, InteractionType, Language } from './types';
 
 // CENTRALIZED STORAGE KEY
 // Bump version to force reset for new content
-export const STORAGE_KEY = 'neve_or_game_state_v13';
+export const STORAGE_KEY = 'neve_or_game_state_v18_gh_assets';
 
-// --- IMAGES (Reusing existing assets where applicable) ---
+// --- IMAGES (Updated to use local assets from public/assets folder) ---
 const IMG = {
-  INTRO: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fintro_1763671828771.jpg?alt=media&v=1',
-  HUB: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2FHUB_CONFIG_1764050216796.jpg?alt=media&v=1',
-  SCHOOL_LIOR: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fschool_lior_1764137954179.jpg?alt=media&v=1',
-  TOWN_SQUARE: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Ftown_square_1764149894637.jpg?alt=media&v=1',
-  CITY_HALL: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_1764066495586.jpg?alt=media&v=1',
-  CITY_HALL_SQUARE: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_square_1764149964367.jpg?alt=media&v=1',
-  CITY_HALL_CAFE: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_cafe_1764066571901.jpg?alt=media&v=1',
-  CITY_HALL_NEIGHBORHOOD: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_neighborhood_1764066598597.jpg?alt=media&v=1',
-  CITY_HALL_SCHOOL: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_sub_sub_school_1764149991251.jpg?alt=media&v=1',
-  FREEDOM_INTRO: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fcity_hall_1764053740252.jpg?alt=media&v=1',
-  SCHOOL_TAMARA: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fschool_tamara_1764536588166.jpg?alt=media&v=1',
-  NEWSPAPER: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fnewspaper_office_1764152226500.jpg?alt=media&v=1',
-  COURT: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/backgrounds%2Fsupreme_court_1764534551866.jpg?alt=media&v=1',
+  INTRO: './assets/intro.jpg',
+  HUB: './assets/hub.jpg',
+  SCHOOL_LIOR: './assets/school_lior.jpg',
+  TOWN_SQUARE: './assets/town_square.jpg',
+  CITY_HALL: './assets/city_hall.jpg',
+  CITY_HALL_SQUARE: './assets/city_hall_sub_sub_square.jpg',
+  CITY_HALL_CAFE: './assets/city_hall_sub_sub_cafe.jpg',
+  CITY_HALL_NEIGHBORHOOD: './assets/city_hall_sub_sub_neighborhood.jpg',
+  CITY_HALL_SCHOOL: './assets/city_hall_sub_sub_school.jpg',
+  FREEDOM_INTRO: './assets/city_hall.jpg', // Reusing city hall background as per original design
+  SCHOOL_TAMARA: './assets/school_tamara.jpg',
+  NEWSPAPER: './assets/newspaper.jpg',
+  COURT: './assets/supreme_court.jpg',
+};
+
+// Item Images (Keeping on Firebase as they were not listed in the new assets folder)
+const ITEMS = {
+  TOWN_SQUARE_1: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Ftown_square_item_1_1764689621233.jpg?alt=media',
+  TOWN_SQUARE_2: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Ftown_square_item_2_1764689655281.jpg?alt=media',
+  TOWN_SQUARE_3: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Ftown_square_item_3_1764689637587.jpg?alt=media',
+  TOWN_SQUARE_4: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Ftown_square_item_4_1764689673228.jpg?alt=media',
+  FREEDOM_1: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_1_1764689708232.jpg?alt=media',
+  FREEDOM_2: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_2_1764689735483.jpg?alt=media',
+  FREEDOM_3: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_3_1764689722534.jpg?alt=media',
+  FREEDOM_4: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_4_1764689748089.jpg?alt=media',
 };
 
 // NOTE: Only the first scenario (school_lior) is unlocked initially.
@@ -110,10 +116,10 @@ const HE_NODES: GameNode[] = [
         interactionType: InteractionType.DRAG_SHIELD,
         interactionData: {
           items: [
-            { id: '1', text: 'ילד עם טלפון שמאוימים עליו ברשת', isDanger: true },
-            { id: '2', text: 'אדם הולך לתומו ברחוב', isDanger: false },
-            { id: '3', text: 'אדם מותקף ברחוב באלימות', isDanger: true },
-            { id: '4', text: 'אזרח משוחח עם שוטר בצורה נעימה', isDanger: false }
+            { id: '1', text: 'ילד עם טלפון שמאוימים עליו ברשת', isDanger: true, image: ITEMS.TOWN_SQUARE_1 },
+            { id: '2', text: 'אדם הולך לתומו ברחוב', isDanger: false, image: ITEMS.TOWN_SQUARE_2 },
+            { id: '3', text: 'אדם מותקף ברחוב באלימות', isDanger: true, image: ITEMS.TOWN_SQUARE_3 },
+            { id: '4', text: 'אזרח משוחח עם שוטר בצורה נעימה', isDanger: false, image: ITEMS.TOWN_SQUARE_4 }
           ]
         },
         decisionQuestion: 'האם הגנת על כולם?',
@@ -211,10 +217,10 @@ const HE_NODES: GameNode[] = [
         interactionType: InteractionType.BALLOONS,
         interactionData: {
           items: [
-            { id: '1', text: 'מותר לי להביע דעה גם אם היא לא פופולרית', isCorrect: false },
-            { id: '2', text: 'אסור לי לדבר נגד הממשלה', isCorrect: true },
-            { id: '3', text: 'אסור לי להעביר ביקורת על מוסדות המדינה', isCorrect: true },
-            { id: '4', text: 'מותר לי לכתוב ביקורת בעיתון', isCorrect: false }
+            { id: '1', text: 'מותר לי להביע דעה גם אם היא לא פופולרית', isCorrect: false, image: ITEMS.FREEDOM_1 },
+            { id: '2', text: 'אסור לי לדבר נגד הממשלה', isCorrect: true, image: ITEMS.FREEDOM_2 },
+            { id: '3', text: 'אסור לי להעביר ביקורת על מוסדות המדינה', isCorrect: true, image: ITEMS.FREEDOM_3 },
+            { id: '4', text: 'מותר לי לכתוב ביקורת בעיתון', isCorrect: false, image: ITEMS.FREEDOM_4 }
           ]
         },
         decisionQuestion: 'סיימתם את המשימה',
@@ -229,7 +235,7 @@ const HE_NODES: GameNode[] = [
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 85, y: 28 },
+      coordinates: { x: 88, y: 35 },
       data: {
         description: 'תמרה, תלמידת י\', כותבת פוסט בפייסבוק נגד המנהלת שביטלה את מועצת התלמידים ללא התייעצות. היא מכנה אותה "דיקטטורית".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -245,14 +251,25 @@ const HE_NODES: GameNode[] = [
           { id: '3', speaker: 'המחנך דני', text: 'שתיכן צודקות חלקית. מותר לבקר, אבל "דיקטטורית" זו תקיפה אישית.', mood: 'neutral' }
         ],
         interactionType: InteractionType.NONE,
-        decisionQuestion: 'מה צריך לקרות עכשיו?',
+        // PHASE 1
+        decisionQuestion: 'חלק א\': מה צריך לקרות עם תמרה?',
         options: [
           { id: '1', text: 'להשעות את תמרה מיד! - אי אפשר לקרוא למנהלת \'דיקטטורית\' בפומבית.', feedback: 'תגובה חריפה מדי. לתלמידים יש זכות לחופש ביטוי.' },
           { id: '2', text: 'תמרה יכולה לבקר את ההחלטה, אבל צריכה לשנות לניסוח ביקורתי שלא מעליב.', feedback: 'נכון. חופש הביטוי חשוב אך אינו מוחלט. יש לשמור על כבוד האדם.' },
           { id: '3', text: 'תמרה יכולה לכתוב מה שהיא רוצה - חופש הביטוי מוחלט.', feedback: 'לא מדויק. חופש הביטוי אינו מתיר לשון הרע.' }
         ],
-        moreInfoTitle: 'זכויות התלמיד',
-        moreInfoContent: 'אמנת זכויות הילד וחוק יסוד כבוד האדם מעניקים לתלמידים חופש ביטוי וזכות השתתפות. ביטול מועצת תלמידים מנוגד לרוח חוק זכויות התלמיד (סעיף 13), הקובע שמוסד חינוך יעודד הקמת מועצה.'
+        moreInfoTitle: 'זכויות התלמיד - חופש הביטוי',
+        moreInfoContent: 'אמנת זכויות הילד (סעיף 13) וחוק יסוד כבוד האדם מעניקים לתלמידים חופש ביטוי, אך הוא כפוף לשמירה על כבודם של אחרים.',
+        
+        // PHASE 2 (Secondary Dilemma)
+        secondaryDecisionQuestion: 'חלק ב\': האם למנהלת סמכות לבטל את המועצה?',
+        secondaryOptions: [
+           { id: '1', text: 'כן, המנהלת רשאית לבטל - היא הסמכות הבכירה בבית הספר', feedback: 'לא נכון. חוק זכויות התלמיד מגן על המועצה.' },
+           { id: '2', text: 'המנהלת יכולה להגביל פעילות, אבל חוק זכויות התלמיד אוסר לבטל אותה', feedback: 'תשובה נכונה! חוק זכויות התלמיד מחייב קיום מועצת תלמידים.' },
+           { id: '3', text: 'המנהלת יכולה לבטל אם יש רוב של תלמידים שמסמיכים', feedback: 'לא מדויק. החוק מחייב את קיום המועצה ללא קשר לרוב רגעי.' }
+        ],
+        secondaryMoreInfoTitle: 'חוק זכויות התלמיד - סעיף 13',
+        secondaryMoreInfoContent: 'חוק זכויות התלמיד (סעיף 13) קובע שמוסד חינוך יעודד הקמת מועצת תלמידים ולא יעשה כל פעולה למנוע את הקמתה. אמנת זכויות הילד מעניקה לילדים זכות השתתפות בהחלטות. לפיכך, ביטול מועצת התלמידים מהווה הפרת חוק. המנהל רשאי לקבוע תקנון פעילות, אך אינו רשאי לבטל אותה לחלוטין.'
       }
     },
     {
@@ -352,7 +369,7 @@ const HE_NODES: GameNode[] = [
         },
         decisionQuestion: 'הקוד פוצח!',
         options: [], 
-        moreInfoTitle: 'כל הכבוד!',
+        moreInfoTitle: 'כל הכבוד! פיצחתם',
         moreInfoContent: 'זכויות האדם הן זכויות יסוד שמבטיחות שכל אחד ואחת יחיו בכבוד, חופש ובביטחון. הן מאפשרות לנו לחיות בחברה שוויונית וצודקת, לשמור על חירותנו ולכבד את האחר.\n\nלכן חשוב להמשיך ללמוד על זכויות האדם, להבין את האתגרים שבהגנה עליהן, ולהיאבק כדי שהן ימומשו לכולם – תמיד, בכל מקום. כל פעולה למען זכויות האדם עושה את העולם שלנו צודק ובטוח יותר.'
       }
     }
@@ -438,10 +455,10 @@ const AR_NODES: GameNode[] = [
         interactionType: InteractionType.DRAG_SHIELD,
         interactionData: {
           items: [
-            { id: '1', text: 'طفل يحمل هاتفًا ويتعرّض للتهديد عبر الإنترنت', isDanger: true },
-            { id: '2', text: 'شخص يمشي في الشارع', isDanger: false },
-            { id: '3', text: 'شخص يتعرّض للاعتداء في الشارع', isDanger: true },
-            { id: '4', text: 'مواطن يحميه ضابط شرطة', isDanger: false }
+            { id: '1', text: 'طفل يحمل هاتفًا ويتعرّض للتهديد عبر الإنترنت', isDanger: true, image: ITEMS.TOWN_SQUARE_1 },
+            { id: '2', text: 'شخص يمشي في الشارع', isDanger: false, image: ITEMS.TOWN_SQUARE_2 },
+            { id: '3', text: 'شخص يتعرّض للاعتداء في الشارع', isDanger: true, image: ITEMS.TOWN_SQUARE_3 },
+            { id: '4', text: 'مواطن يحميه ضابط شرطة', isDanger: false, image: ITEMS.TOWN_SQUARE_4 }
           ]
         },
         decisionQuestion: 'هل قمت بحماية الجميع؟',
@@ -539,10 +556,10 @@ const AR_NODES: GameNode[] = [
         interactionType: InteractionType.BALLOONS,
         interactionData: {
           items: [
-            { id: '1', text: 'يُسمح لي بالتعبير عن رأي حتّى لو لا يحظى بشعبيّة', isCorrect: false },
-            { id: '2', text: 'لا يُسمح لي بالتحدّث في نقد الحكومة', isCorrect: true },
-            { id: '3', text: 'لا يُسمح لي بانتقاد مؤسّسات الدولة', isCorrect: true },
-            { id: '4', text: 'يُسمح لي بكتابة مراجعة في صحيفة', isCorrect: false }
+            { id: '1', text: 'يُسمح لي بالتعبير عن رأي حتّى لو لا يحظى بشعبيّة', isCorrect: false, image: ITEMS.FREEDOM_1 },
+            { id: '2', text: 'لا يُسمح لي بالتحدّث في نقد الحكومة', isCorrect: true, image: ITEMS.FREEDOM_2 },
+            { id: '3', text: 'لا يُسمح لي بانتقاد مؤسّسات الدولة', isCorrect: true, image: ITEMS.FREEDOM_3 },
+            { id: '4', text: 'يُسمح لي بكتابة مراجعة في صحيفة', isCorrect: false, image: ITEMS.FREEDOM_4 }
           ]
         },
         decisionQuestion: 'انتهت المهمة',
@@ -557,7 +574,7 @@ const AR_NODES: GameNode[] = [
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 85, y: 28 },
+      coordinates: { x: 88, y: 35 },
       data: {
         description: 'كتبت ربى، طالبة في الصف العاشر، منشورًا على فيسبوك تنتقد فيه بشدّة المديرة التي ألغت مجلس الطلّاب، ووصفتها بـ"الديكتاتورية".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -573,14 +590,25 @@ const AR_NODES: GameNode[] = [
           { id: '3', speaker: 'المعلم اياد', text: 'كلاكما مُحقّان جزئيًّا. ربى، من حقّكِ الانتقاد، ولكن هناك فرق بين النقد والهجوم الشخصي.', mood: 'neutral' }
         ],
         interactionType: InteractionType.NONE,
-        decisionQuestion: 'ما الذي ينبغي أن يحدث؟',
+        // PHASE 1
+        decisionQuestion: 'الجزء الأول: ما الذي ينبغي أن يحدث؟',
         options: [
           { id: '1', text: 'إبعاد ربى فورًا عن التعليم! - لا يمكنك وصف المديرة بـ "الديكتاتورية" علنًا.', feedback: 'رد فعل مبالغ فيه. للطلاب الحق في حرية التعبير.' },
           { id: '2', text: 'يُمكن لربى انتقاد القرار، لكن عليها التغيير إلى صياغة نقدية غير مهينة.', feedback: 'صحيح. حرّيّة التعبير مهمّة ولكنها ليست مُطلقة. يجب الحفاظ على الكرامة.' },
           { id: '3', text: 'يُمكن لربى كتابة ما تشاء - حرية التعبير مطلقة.', feedback: 'غير دقيق. حرّيّة التعبير لا تسمح بالتشهير.' }
         ],
         moreInfoTitle: 'حقوق الطالب',
-        moreInfoContent: 'تمنح معاهدة حقوق الطفل وقانون الأساس الطلاب حرية التعبير والمشاركة. يُعدّ إلغاء مجلس الطلّاب انتهاكًا لقانون حقوق الطلاب (المادة 13).'
+        moreInfoContent: 'تمنح معاهدة حقوق الطفل وقانون الأساس الطلاب حرية التعبير والمشاركة.',
+        
+        // PHASE 2
+        secondaryDecisionQuestion: 'الجزء الثاني: ماذا عن صلاحيّة مديرة المدرسة في حلّ مجلس الطلّاب؟',
+        secondaryOptions: [
+           { id: '1', text: 'يحقّ للمديرة حلّ المجلس - فهي أعلى سلطة في المدرسة', feedback: 'خطأ. قانون حقوق الطلاب يحمي المجلس.' },
+           { id: '2', text: 'يحقّ للمديرة تقييد أنشطة المجلس، إلا أن قانون حقوق الطلّاب يحظر إلغاؤه وحلّه', feedback: 'إجابة صحيحة! يلزم القانون وجود مجلس طلابي.' },
+           { id: '3', text: 'يحقّ للمديرة حلّ المجلس إذا وافقت أغلبيّة الطلاب على ذلك', feedback: 'غير دقيق. القانون يلزم بوجود المجلس بغض النظر عن الأغلبية.' }
+        ],
+        secondaryMoreInfoTitle: 'قانون حقوق الطلاب',
+        secondaryMoreInfoContent: 'ينصّ قانون حقوق الطلاب (المادة ١٣) على أن المؤسّسة التعليميّة يجب أن تشجّع على إنشاء مجلس طلابيّ، ولا يجوز لها اتّخاذ أي إجراء لمنع إنشائه. تمنح معاهدة حقوق الطفل الأطفال الحقّ في المشاركة في القرارات التي تؤثّر عليهم. لذلك، يُعدّ إلغاء مجلس الطلّاب انتهاكًا للقانون. يجوز للمديرة تحديد قواعد عمل المجلس، ولكن لا يجوز لها إلغاؤه كلّيًّا.'
       }
     },
     {
@@ -766,10 +794,10 @@ const EN_NODES: GameNode[] = [
         interactionType: InteractionType.DRAG_SHIELD,
         interactionData: {
           items: [
-            { id: '1', text: 'Child threatened online', isDanger: true },
-            { id: '2', text: 'Person walking innocently', isDanger: false },
-            { id: '3', text: 'Person attacked on street', isDanger: true },
-            { id: '4', text: 'Citizen talking to police', isDanger: false }
+            { id: '1', text: 'Child threatened online', isDanger: true, image: ITEMS.TOWN_SQUARE_1 },
+            { id: '2', text: 'Person walking innocently', isDanger: false, image: ITEMS.TOWN_SQUARE_2 },
+            { id: '3', text: 'Person attacked on street', isDanger: true, image: ITEMS.TOWN_SQUARE_3 },
+            { id: '4', text: 'Citizen talking to police', isDanger: false, image: ITEMS.TOWN_SQUARE_4 }
           ]
         },
         decisionQuestion: 'Did you protect everyone?',
@@ -867,10 +895,10 @@ In other words, public security does not automatically override the right to pri
         interactionType: InteractionType.BALLOONS,
         interactionData: {
           items: [
-            { id: '1', text: 'Allowed to express unpopular opinion', isCorrect: false },
-            { id: '2', text: 'Forbidden to speak against government', isCorrect: true },
-            { id: '3', text: 'Forbidden to criticize institutions', isCorrect: true },
-            { id: '4', text: 'Allowed to write review in newspaper', isCorrect: false }
+            { id: '1', text: 'Allowed to express unpopular opinion', isCorrect: false, image: ITEMS.FREEDOM_1 },
+            { id: '2', text: 'Forbidden to speak against government', isCorrect: true, image: ITEMS.FREEDOM_2 },
+            { id: '3', text: 'Forbidden to criticize institutions', isCorrect: true, image: ITEMS.FREEDOM_3 },
+            { id: '4', text: 'Allowed to write review in newspaper', isCorrect: false, image: ITEMS.FREEDOM_4 }
           ]
         },
         decisionQuestion: 'Mission Complete',
@@ -885,7 +913,7 @@ In other words, public security does not automatically override the right to pri
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 85, y: 28 },
+      coordinates: { x: 88, y: 35 },
       data: {
         description: 'Tamara, a 10th grade student, writes a Facebook post against the principal who cancelled the Student Council without consultation. She calls her a "Dictator".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -901,14 +929,25 @@ In other words, public security does not automatically override the right to pri
           { id: '3', speaker: 'Teacher Danny', text: 'You are both partially right. Criticism is allowed, but "dictator" is a personal attack.', mood: 'neutral' }
         ],
         interactionType: InteractionType.NONE,
-        decisionQuestion: 'What should happen now?',
+        // PHASE 1
+        decisionQuestion: 'Part 1: What should happen with Tamara?',
         options: [
           { id: '1', text: 'Suspend Tamara immediately! - You can\'t call the principal a "dictator" publicly.', feedback: 'Too harsh. Students have a right to freedom of speech.' },
           { id: '2', text: 'Tamara can criticize the decision, but needs to change to critical wording that isn\'t insulting.', feedback: 'Correct. Freedom of speech is important but not absolute. Human dignity must be maintained.' },
           { id: '3', text: 'Tamara can write whatever she wants - freedom of speech is absolute.', feedback: 'Inaccurate. Freedom of speech does not permit defamation.' }
         ],
         moreInfoTitle: 'Student Rights',
-        moreInfoContent: 'The Convention on the Rights of the Child and Basic Laws grant students freedom of speech and participation. Cancelling a student council contradicts the Student Rights Law (Section 13), which states an institution will encourage a council.'
+        moreInfoContent: 'The Convention on the Rights of the Child and Basic Laws grant students freedom of speech and participation.',
+        
+        // PHASE 2
+        secondaryDecisionQuestion: 'Part 2: Does the principal have authority to cancel the council?',
+        secondaryOptions: [
+           { id: '1', text: 'Yes, principal is the highest authority', feedback: 'Incorrect. Student Rights Law protects the council.' },
+           { id: '2', text: 'Principal can limit activities, but the Law forbids cancelling it', feedback: 'Correct! The law mandates a student council.' },
+           { id: '3', text: 'Principal can cancel if a majority agrees', feedback: 'Inaccurate. The law mandates it regardless of majority.' }
+        ],
+        secondaryMoreInfoTitle: 'Student Rights Law',
+        secondaryMoreInfoContent: 'The Student Rights Law (Section 13) states that an educational institution shall encourage the establishment of a student council and shall not take any action to prevent its establishment. Therefore, cancelling the Student Council constitutes a violation of the law. The principal may establish regulations, but cannot cancel it entirely.'
       }
     },
     {

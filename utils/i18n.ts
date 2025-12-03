@@ -1,5 +1,3 @@
-
-
 import { Language } from '../types';
 
 export const translations = {
@@ -7,6 +5,7 @@ export const translations = {
     start: 'התחל את המשחק',
     devMode: 'כניסה למצב מפתח (Dev Mode)',
     backToMap: 'חזור למפה',
+    stepBack: 'צעד אחורה',
     locked: 'נעול',
     completed: 'הושלם',
     open: 'פתוח למשחק',
@@ -32,8 +31,8 @@ export const translations = {
     mission: 'משימה',
     socialMedia: 'רשת חברתית',
     newsAlert: 'מבזק חדשות',
+    likes: 'לייקים',
     
-    // Sub-scenes & Interactions
     chooseLocation: 'בחר מיקום כדי לשמוע את התושבים',
     visited: '✓ ביקרת כאן',
     clickToListen: 'לחץ להאזנה',
@@ -42,22 +41,18 @@ export const translations = {
     visitMore: 'בקר בעוד',
     locations: 'מוקדים',
     
-    // Mini-games instructions
     balloonsInst: '🎈 פוצצו רק את הבלונים שמראים פגיעה בחופש הביטוי!',
     shieldInst: '🛡️ הגנו על מי שביטחונו נפגע!',
     
-    // Feedback
     yourChoice: 'הבחירה שלך:',
 
-    // Device / UI
-    rotateDevice: 'נא לסובב את המכשיר למצב מאוזן 🔄',
-    fullScreen: 'מסך מלא',
-    exitFullScreen: 'יציאה ממסך מלא'
+    rotateDevice: 'נא לסובב את המכשיר למצב מאוזן 🔄'
   },
   en: {
     start: 'Start Game',
     devMode: 'Enter Dev Mode',
     backToMap: 'Back to Map',
+    stepBack: 'Step Back',
     locked: 'Locked',
     completed: 'Completed',
     open: 'Open',
@@ -83,6 +78,7 @@ export const translations = {
     mission: 'MISSION',
     socialMedia: 'SOCIAL MEDIA',
     newsAlert: 'NEWS ALERT',
+    likes: 'Likes',
     
     chooseLocation: 'Select a location to hear the residents',
     visited: '✓ Visited',
@@ -97,14 +93,13 @@ export const translations = {
     
     yourChoice: 'Your Choice:',
 
-    rotateDevice: 'Please rotate your device to landscape 🔄',
-    fullScreen: 'Full Screen',
-    exitFullScreen: 'Exit Full Screen'
+    rotateDevice: 'Please rotate your device to landscape 🔄'
   },
   ar: {
     start: 'ابدأ اللعبة',
     devMode: 'وضع المطور',
     backToMap: 'العودة إلى الخريطة',
+    stepBack: 'رجوع',
     locked: 'مغلق',
     completed: 'مكتمل',
     open: 'مفتوح',
@@ -130,6 +125,7 @@ export const translations = {
     mission: 'مهمة',
     socialMedia: 'وسائل التواصل',
     newsAlert: 'خبر عاجل',
+    likes: 'إعجاب',
     
     chooseLocation: 'اختر موقعًا للاستماع إلى السكان',
     visited: '✓ زرت هنا',
@@ -144,9 +140,7 @@ export const translations = {
     
     yourChoice: 'اختيارك:',
 
-    rotateDevice: 'يرجى تدوير الجهاز إلى الوضع الأفقي 🔄',
-    fullScreen: 'ملء الشاشة',
-    exitFullScreen: 'خروج من ملء الشاشة'
+    rotateDevice: 'يرجى تدوير الجهاز إلى الوضع الأفقي 🔄'
   }
 };
 

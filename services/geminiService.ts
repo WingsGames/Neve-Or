@@ -12,28 +12,43 @@ const getClient = () => {
   return new GoogleGenAI({ apiKey });
 };
 
+// Helper to extract image from Gemini 2.5 Flash Image response
+const extractImageFromResponse = (response: any): string | null => {
+  if (!response || !response.candidates || !response.candidates[0]?.content?.parts) {
+    return null;
+  }
+
+  for (const part of response.candidates[0].content.parts) {
+    if (part.inlineData && part.inlineData.data) {
+      return `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
+    }
+  }
+  return null;
+};
+
 export const generateSceneImage = async (sceneDescription: string): Promise<string | null> => {
   const client = getClient();
   if (!client) return null;
 
   try {
-    const response = await client.models.generateImages({
-      model: 'imagen-4.0-generate-001',
-      prompt: `STRICTLY NO TEXT. NO WORDS. NO LETTERS. NO SIGNS. NO LABELS. NO SPEECH BUBBLES. NO SPLIT SCREEN. NO COLLAGE. ONE UNIFIED SCENE. A clean, text-free vector art illustration in digital city style, flat design, modern colors. The scene depicts: ${sceneDescription}. The image must be purely visual with absolutely no written language or symbols representing text.`,
-      config: {
-        numberOfImages: 1,
-        outputMimeType: 'image/jpeg',
-        aspectRatio: '16:9',
+    const response = await client.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [{
+          text: `Create a clean, text-free vector art illustration in digital city style, flat design, modern colors. The scene depicts: ${sceneDescription}. NO WORDS, NO LABELS, NO TEXT. Aspect ratio 16:9.`
+        }]
       },
+      config: {
+        imageConfig: {
+          aspectRatio: "16:9",
+          // outputMimeType is not supported for gemini-2.5-flash-image
+        }
+      }
     });
 
-    const base64ImageBytes = response.generatedImages?.[0]?.image?.imageBytes;
-    if (base64ImageBytes) {
-      return `data:image/jpeg;base64,${base64ImageBytes}`;
-    }
-    return null;
+    return extractImageFromResponse(response);
   } catch (error) {
-    console.error("Error generating image:", error);
+    console.error("Error generating scene image:", error);
     return null;
   }
 };
@@ -43,23 +58,49 @@ export const generateCharacterImage = async (characterName: string, mood: string
   if (!client) return null;
 
   try {
-    const response = await client.models.generateImages({
-      model: 'imagen-4.0-generate-001',
-      prompt: `STRICTLY NO TEXT. NO WORDS. NO LETTERS. NO NAME TAGS. Vector art avatar portrait of a character named "${characterName}", looking ${mood}. Digital city style, flat design, circle background. Minimalist features. Purely visual character design.`,
-      config: {
-        numberOfImages: 1,
-        outputMimeType: 'image/jpeg',
-        aspectRatio: '1:1',
+    const response = await client.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [{
+          text: `Create a vector art avatar portrait of a character named "${characterName}", looking ${mood}. Digital city style, flat design, circle background. Minimalist features. NO TEXT. Aspect ratio 1:1.`
+        }]
       },
+      config: {
+        imageConfig: {
+          aspectRatio: "1:1"
+        }
+      }
     });
 
-    const base64ImageBytes = response.generatedImages?.[0]?.image?.imageBytes;
-    if (base64ImageBytes) {
-      return `data:image/jpeg;base64,${base64ImageBytes}`;
-    }
-    return null;
+    return extractImageFromResponse(response);
   } catch (error) {
     console.error("Error generating character image:", error);
+    return null;
+  }
+};
+
+export const generateItemImage = async (itemDescription: string): Promise<string | null> => {
+  const client = getClient();
+  if (!client) return null;
+
+  try {
+    const response = await client.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [{
+          text: `Create a simple, clean vector art icon or illustration of: ${itemDescription}. Digital flat design style, white background, minimalist. Purely visual object. NO TEXT. Aspect ratio 1:1.`
+        }]
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: "1:1"
+        }
+      }
+    });
+
+    return extractImageFromResponse(response);
+  } catch (error) {
+    console.error("Error generating item image:", error);
     return null;
   }
 };

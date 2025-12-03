@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { GameNode, GameState } from '../types';
 import { STORAGE_KEY } from '../constants';
 import { Button } from './ui/Button';
-import { generateSceneImage, generateCharacterImage } from '../services/geminiService';
+import { generateSceneImage, generateCharacterImage, generateItemImage } from '../services/geminiService';
 import { uploadImageToFirebase } from '../services/storageService';
 
 interface Props {
@@ -13,7 +12,20 @@ interface Props {
   isStorageFull?: boolean;
 }
 
-type Tab = 'CONTENT' | 'ASSETS';
+type Tab = 'CONTENT' | 'ASSETS' | 'INTERACTION';
+
+// Mapping for sensitive items to ensure safe generation prompts
+// Keys are formatted as `${nodeId}_${itemId}` to avoid collisions
+const SAFE_PROMPTS: Record<string, string> = {
+    // Node 2 - Town Square (Safety items)
+    'town_square_1': 'A vector icon representing cyberbullying awareness, abstract, sad face with phone, blue colors, flat design', // Original: Child threatened online
+    'town_square_3': 'A vector icon representing danger or conflict, silhouette figures running, red warning color, flat design', // Original: Person attacked
+    
+    // Node 4 - Freedom of Speech (Balloons)
+    // These are text based usually, but we want icons
+    'intro_freedom_speech_2': 'A vector icon of a mouth with a zipper or tape, representing silence, flat design',
+    'intro_freedom_speech_3': 'A vector icon of a building with a prohibition sign, flat design',
+};
 
 export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose, isStorageFull }) => {
   const [selectedNodeId, setSelectedNodeId] = useState<string>(gameState.nodes.length > 0 ? gameState.nodes[0].id : '');
@@ -39,6 +51,8 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
   const uniqueSpeakers: string[] = (activeNode && activeNode.data && activeNode.data.dialog) 
     ? Array.from(new Set(activeNode.data.dialog.map(m => m.speaker))) 
     : [];
+  
+  const interactionItems = activeNode?.data.interactionData?.items || [];
 
   // Calculate generic storage usage estimation
   useEffect(() => {
@@ -64,8 +78,6 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (!activeNode) return;
     if (isEditingSubScene) {
-        // Sub-scene descriptions are not usually editable in this simple UI, but we could add it.
-        // For now, we only edit the main node description as the 'context' for generation.
         updateNodeData(activeNode.id, { description: e.target.value });
     } else {
         updateNodeData(activeNode.id, { description: e.target.value });
@@ -85,6 +97,11 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
 
     if (activeNode.id === 'newspaper_office' && !isEditingSubScene) {
        prompt = "A close-up view of a modern journalist's desk. Aesthetic and clean office interior. Includes a computer screen (blank), a coffee cup, notebooks, and pens. Soft lighting. Digital city vector art style. STRICTLY NO TEXT, NO HEADLINES, NO LETTERS anywhere.";
+    }
+    
+    // NEW: Special prompt for Balloons / Sky level
+    if (activeNode.id === 'intro_freedom_speech') {
+        prompt = "A beautiful bright blue sky with fluffy white clouds. Digital vector art style, flat design, minimalist. Use soft blue and white colors. It is a background for a balloon game. STRICTLY NO TEXT, NO GROUND, NO BUILDINGS, JUST SKY.";
     }
 
     if (isEditingSubScene && activeSubScene) {
@@ -115,7 +132,7 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
           updateNodeData(activeNode.id, { backgroundImage: imageUrl });
       }
     } else {
-      alert('שגיאה ביצירת תמונה. וודא שיש API KEY.');
+      alert('שגיאה ביצירת תמונה. וודא שיש API KEY תקין (בדוק Console לפרטים).');
     }
   };
 
@@ -131,7 +148,57 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
       updateNodeData(activeNode.id, { 
         characterImages: { ...currentImages, [speaker]: imageUrl } 
       });
+    } else {
+        alert('שגיאה ביצירת דמות. בדוק API KEY או נסה שוב.');
     }
+  };
+
+  const handleGenerateItemImage = async (itemId: string, itemText: string) => {
+      if (!activeNode) return;
+      setIsProcessing(`gen_item_${itemId}`);
+      
+      // Use Safe Prompt if available, otherwise use item text
+      // Safe prompts avoid violence/safety triggers
+      // Look up by node_id + item_id to support duplicates across nodes
+      const promptKey = `${activeNode.id}_${itemId}`;
+      const prompt = SAFE_PROMPTS[promptKey] || itemText;
+      
+      const imageUrl = await generateItemImage(prompt);
+      setIsProcessing(null);
+      
+      if (imageUrl) {
+          const currentItems = activeNode.data.interactionData?.items || [];
+          const newItems = currentItems.map((item: any) => 
+              item.id === itemId ? { ...item, image: imageUrl } : item
+          );
+          updateNodeData(activeNode.id, {
+             interactionData: { ...activeNode.data.interactionData, items: newItems }
+          });
+      } else {
+          alert(`שגיאה ביצירת תמונה עבור "${itemText}". ייתכן שהתיאור מפר מדיניות בטיחות או שיש בעיית רשת.`);
+      }
+  };
+
+  const handleUploadItemImage = async (itemId: string) => {
+      if (!activeNode) return;
+      const item = activeNode.data.interactionData?.items.find((i: any) => i.id === itemId);
+      if (!item || !item.image || !item.image.startsWith('data:')) return;
+
+      setIsProcessing(`up_item_${itemId}`);
+      const filename = `items/${activeNode.id}_item_${itemId}_${Date.now()}.jpg`;
+      const url = await uploadImageToFirebase(item.image, filename);
+      setIsProcessing(null);
+
+      if (url) {
+          const currentItems = activeNode.data.interactionData?.items || [];
+          const newItems = currentItems.map((i: any) => 
+              i.id === itemId ? { ...i, image: url } : i
+          );
+          updateNodeData(activeNode.id, {
+             interactionData: { ...activeNode.data.interactionData, items: newItems }
+          });
+          alert('תמונת הפריט נשמרה בענן!');
+      }
   };
 
   const handleUploadBG = async () => {
@@ -221,6 +288,7 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
           <h2 className="text-xl font-bold">🛠️ Dev Panel</h2>
           <div className="flex bg-gray-800 rounded-lg p-1">
              <button onClick={() => setActiveTab('ASSETS')} className={`px-4 py-1 rounded-md text-sm font-bold transition ${activeTab === 'ASSETS' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>נכסים (AI & Cloud)</button>
+             <button onClick={() => setActiveTab('INTERACTION')} className={`px-4 py-1 rounded-md text-sm font-bold transition ${activeTab === 'INTERACTION' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>פריטי משחק</button>
              <button onClick={() => setActiveTab('CONTENT')} className={`px-4 py-1 rounded-md text-sm font-bold transition ${activeTab === 'CONTENT' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>עריכת תוכן</button>
           </div>
         </div>
@@ -380,6 +448,43 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
                   )}
                 </>
               )}
+
+              {activeTab === 'INTERACTION' && (
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                     <h3 className="text-lg font-bold text-gray-800 mb-4">🖼️ פריטי משחק (אינטראקציה)</h3>
+                     {interactionItems.length === 0 ? (
+                         <p className="text-gray-500 text-center py-4">לשלב זה אין פריטי אינטראקציה עם תמונות.</p>
+                     ) : (
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             {interactionItems.map((item: any) => {
+                                 const hasImage = !!item.image;
+                                 const isCloud = hasImage && !item.image.startsWith('data:');
+                                 return (
+                                     <div key={item.id} className="border p-3 rounded-xl bg-gray-50 flex gap-3">
+                                         <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border">
+                                              {hasImage ? <img src={item.image} className="w-full h-full object-cover" /> : <span className="text-xs text-gray-400">אין תמונה</span>}
+                                         </div>
+                                         <div className="flex-1 flex flex-col justify-between">
+                                             <div className="text-xs font-bold text-gray-700 line-clamp-2" title={item.text}>{item.text}</div>
+                                             <div className="flex gap-2 mt-2">
+                                                 <Button variant="outline" className="text-[10px] py-1 px-2 flex-1" onClick={() => handleGenerateItemImage(item.id, item.text)} disabled={!!isProcessing}>
+                                                    {isProcessing === `gen_item_${item.id}` ? '⏳' : '✨ צור'}
+                                                 </Button>
+                                                 {hasImage && !isCloud && (
+                                                     <Button variant="secondary" className="text-[10px] py-1 px-2 flex-1 bg-orange-500 text-white" onClick={() => handleUploadItemImage(item.id)} disabled={!!isProcessing}>
+                                                         {isProcessing === `up_item_${item.id}` ? '☁️...' : '☁️ שמור'}
+                                                     </Button>
+                                                 )}
+                                             </div>
+                                         </div>
+                                     </div>
+                                 )
+                             })}
+                         </div>
+                     )}
+                  </div>
+              )}
+
               {activeTab === 'CONTENT' && !isEditingSubScene && (
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
                   <div>

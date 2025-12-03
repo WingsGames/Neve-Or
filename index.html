@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
   <head>
@@ -11,8 +12,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
+      /* Enforce Heebo everywhere */
+      * {
+        font-family: 'Heebo', sans-serif !important;
+      }
+      
       body {
-        font-family: 'Heebo', sans-serif;
         background-color: #0f172a; /* Dark background to match game */
         overflow: hidden; /* Prevent scroll bounce */
         touch-action: manipulation;
@@ -22,14 +27,14 @@
         width: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
+        background: rgba(241, 241, 241, 0.5); 
       }
       ::-webkit-scrollbar-thumb {
-        background: #888; 
+        background: rgba(136, 136, 136, 0.6); 
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #555; 
+        background: rgba(85, 85, 85, 0.8); 
       }
 
       /* Animations */
@@ -80,6 +85,17 @@
       }
       .animate-rotate-phone {
         animation: rotate-phone 2s infinite ease-in-out;
+      }
+
+      /* Confetti Animation */
+      @keyframes confetti-fall {
+        0% { transform: translateY(-10%) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+      }
+      .animate-confetti {
+        animation-name: confetti-fall;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
       }
 
       /* --- Realistic Balloon CSS --- */
