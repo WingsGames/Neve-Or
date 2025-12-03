@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GameNode, InteractionType, Language, SubScene } from '../types';
 import { Button } from './ui/Button';
@@ -362,28 +363,52 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
           const canProceed = visitedSubScenes.size >= 3; 
           return (
-            <div className="h-full flex flex-col items-center justify-center animate-fade-in max-w-4xl mx-auto w-full relative z-10">
+            <div className="h-full flex flex-col items-center justify-center animate-fade-in max-w-5xl mx-auto w-full relative z-10">
                <h3 className="text-sm font-black text-white mb-2 text-center drop-shadow-lg bg-black/40 px-4 py-1.5 rounded-xl backdrop-blur-md flex-shrink-0 border border-white/10 w-fit">
                  {t('chooseLocation', language)}
                </h3>
-               {/* Shrink grid to content (w-fit) */}
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-fit max-w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar p-1">
+               
+               {/* Updated Grid for Desktop: 2 cols on small, 4 cols on large. Vertical Cards. */}
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar p-2 items-center">
                  {data.subScenes.map(scene => {
                    const isVisited = visitedSubScenes.has(scene.id);
                    return (
                      <button key={scene.id} onClick={() => { playSfx('click'); setActiveSubScene(scene); }}
-                       className={`relative overflow-hidden p-2 rounded-xl transition-all flex items-center gap-3 shadow-md group text-right min-h-[50px] border border-white/30 ${isVisited ? 'bg-black/50 backdrop-blur-sm' : 'bg-white/80 backdrop-blur-sm hover:bg-white/90'}`}
+                       className={`
+                         relative overflow-hidden rounded-2xl transition-all shadow-lg group border-2 flex flex-col
+                         aspect-[3/4] sm:aspect-[4/5] hover:scale-105 active:scale-95
+                         ${isVisited ? 'border-green-400 ring-2 ring-green-200' : 'border-white/50 hover:border-white'}
+                       `}
                      >
-                       {scene.backgroundImage && <div className="absolute inset-0 opacity-40 z-0"><img src={scene.backgroundImage} className="w-full h-full object-cover" alt="" /></div>}
-                       <div className="relative z-10 text-xl drop-shadow-sm">{scene.icon}</div>
-                       <div className="relative z-10 flex-1">
-                         <div className={`font-black text-xs sm:text-sm ${isVisited ? 'text-white' : 'text-gray-900'}`}>{scene.title}</div>
-                         <div className={`text-[10px] font-bold ${isVisited ? 'text-green-300' : 'text-blue-600'}`}>{isVisited ? t('visited', language) : t('clickToListen', language)}</div>
-                       </div>
+                        {/* Image Area (Top 2/3) */}
+                        <div className="h-2/3 w-full relative overflow-hidden bg-slate-800">
+                           {scene.backgroundImage ? (
+                             <img src={scene.backgroundImage} className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${isVisited ? 'grayscale-[50%]' : ''}`} alt="" />
+                           ) : (
+                             <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                           )}
+                           <div className="absolute top-2 right-2 text-3xl drop-shadow-md">{scene.icon}</div>
+                           
+                           {/* Visited Checkmark Overlay */}
+                           {isVisited && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
+                                 <div className="bg-green-500 text-white rounded-full p-2 shadow-lg border-2 border-white">✓</div>
+                              </div>
+                           )}
+                        </div>
+
+                        {/* Text Area (Bottom 1/3) */}
+                        <div className={`h-1/3 w-full flex flex-col items-center justify-center p-2 text-center transition-colors ${isVisited ? 'bg-slate-100' : 'bg-white/95 backdrop-blur-md'}`}>
+                           <span className="font-black text-xs sm:text-sm text-blue-900 leading-tight mb-1">{scene.title}</span>
+                           <span className={`text-[10px] font-bold uppercase tracking-wider ${isVisited ? 'text-green-600' : 'text-blue-500'}`}>
+                             {isVisited ? t('visited', language) : t('clickToListen', language)}
+                           </span>
+                        </div>
                      </button>
                    );
                  })}
                </div>
+
                <div className="mt-2 w-full flex justify-center flex-shrink-0">
                  <Button onClick={() => setPhase('DECISION')} disabled={!canProceed} className={`py-1.5 px-6 rounded-full text-xs font-bold shadow-lg border border-white/20 backdrop-blur-sm ${canProceed ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-500/50 cursor-not-allowed'}`}>
                    {canProceed ? t('proceedToDecision', language) : `${t('visitMore', language)} ${3 - visitedSubScenes.size}`}
@@ -523,8 +548,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                     }}
                                  >
                                      <div className={`absolute inset-0 balloon-shape ${index % 2 === 0 ? 'bg-red-500' : index % 3 === 0 ? 'bg-blue-500' : 'bg-yellow-400'} overflow-hidden`}>
-                                        {/* Image support: Removed mix-blend-multiply to fix visibility issues on dark/white images */}
-                                        {item.image && <img src={item.image} className="w-full h-full object-cover relative z-0" alt="" />}
                                      </div>
                                      <span className="relative z-10 text-[10px] sm:text-xs font-bold text-white leading-tight drop-shadow-md px-1 bg-black/20 rounded backdrop-blur-[1px]">{item.text}</span>
                                      <div className="absolute top-full left-1/2 w-[1px] h-12 bg-white/50 origin-top animate-[stringWave_3s_ease-in-out_infinite]"></div>
@@ -793,7 +816,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
        </div>
 
        {/* Main Container */}
-       <main className="flex-1 p-1 sm:p-4 max-w-4xl mx-auto w-full relative z-10 flex flex-col min-h-0 overflow-hidden justify-start pointer-events-none">
+       <main className="flex-1 p-1 sm:p-4 max-w-6xl mx-auto w-full relative z-10 flex flex-col min-h-0 overflow-hidden justify-start pointer-events-none">
          {/* Re-enable pointer events for the actual content card */}
          <div className="pointer-events-auto w-full h-full flex flex-col">
             {renderContent()}

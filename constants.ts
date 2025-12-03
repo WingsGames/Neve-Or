@@ -1,8 +1,9 @@
+
 import { GameNode, NodeType, InteractionType, Language } from './types';
 
 // CENTRALIZED STORAGE KEY
 // Bump version to force reset for new content
-export const STORAGE_KEY = 'neve_or_game_state_v18_gh_assets';
+export const STORAGE_KEY = 'neve_or_game_state_v19_gh_assets_no_balloons_img';
 
 // --- IMAGES (Updated to use local assets from public/assets folder) ---
 const IMG = {
@@ -27,10 +28,6 @@ const ITEMS = {
   TOWN_SQUARE_2: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Ftown_square_item_2_1764689655281.jpg?alt=media',
   TOWN_SQUARE_3: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Ftown_square_item_3_1764689637587.jpg?alt=media',
   TOWN_SQUARE_4: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Ftown_square_item_4_1764689673228.jpg?alt=media',
-  FREEDOM_1: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_1_1764689708232.jpg?alt=media',
-  FREEDOM_2: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_2_1764689735483.jpg?alt=media',
-  FREEDOM_3: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_3_1764689722534.jpg?alt=media',
-  FREEDOM_4: 'https://firebasestorage.googleapis.com/v0/b/neve-or.firebasestorage.app/o/items%2Fintro_freedom_speech_item_4_1764689748089.jpg?alt=media',
 };
 
 // NOTE: Only the first scenario (school_lior) is unlocked initially.
@@ -217,10 +214,10 @@ const HE_NODES: GameNode[] = [
         interactionType: InteractionType.BALLOONS,
         interactionData: {
           items: [
-            { id: '1', text: 'מותר לי להביע דעה גם אם היא לא פופולרית', isCorrect: false, image: ITEMS.FREEDOM_1 },
-            { id: '2', text: 'אסור לי לדבר נגד הממשלה', isCorrect: true, image: ITEMS.FREEDOM_2 },
-            { id: '3', text: 'אסור לי להעביר ביקורת על מוסדות המדינה', isCorrect: true, image: ITEMS.FREEDOM_3 },
-            { id: '4', text: 'מותר לי לכתוב ביקורת בעיתון', isCorrect: false, image: ITEMS.FREEDOM_4 }
+            { id: '1', text: 'מותר לי להביע דעה גם אם היא לא פופולרית', isCorrect: false },
+            { id: '2', text: 'אסור לי לדבר נגד הממשלה', isCorrect: true },
+            { id: '3', text: 'אסור לי להעביר ביקורת על מוסדות המדינה', isCorrect: true },
+            { id: '4', text: 'מותר לי לכתוב ביקורת בעיתון', isCorrect: false }
           ]
         },
         decisionQuestion: 'סיימתם את המשימה',
@@ -556,10 +553,10 @@ const AR_NODES: GameNode[] = [
         interactionType: InteractionType.BALLOONS,
         interactionData: {
           items: [
-            { id: '1', text: 'يُسمح لي بالتعبير عن رأي حتّى لو لا يحظى بشعبيّة', isCorrect: false, image: ITEMS.FREEDOM_1 },
-            { id: '2', text: 'لا يُسمح لي بالتحدّث في نقد الحكومة', isCorrect: true, image: ITEMS.FREEDOM_2 },
-            { id: '3', text: 'لا يُسمح لي بانتقاد مؤسّسات الدولة', isCorrect: true, image: ITEMS.FREEDOM_3 },
-            { id: '4', text: 'يُسمح لي بكتابة مراجعة في صحيفة', isCorrect: false, image: ITEMS.FREEDOM_4 }
+            { id: '1', text: 'يُسمح لي بالتعبير عن رأي حتّى لو لا يحظى بشعبيّة', isCorrect: false },
+            { id: '2', text: 'لا يُسمح لي بالتحدّث في نقد الحكومة', isCorrect: true },
+            { id: '3', text: 'لا يُسمح لي بانتقاد مؤسّسات الدولة', isCorrect: true },
+            { id: '4', text: 'يُسمح لي بكتابة مراجعة في صحيفة', isCorrect: false }
           ]
         },
         decisionQuestion: 'انتهت المهمة',
@@ -895,10 +892,10 @@ In other words, public security does not automatically override the right to pri
         interactionType: InteractionType.BALLOONS,
         interactionData: {
           items: [
-            { id: '1', text: 'Allowed to express unpopular opinion', isCorrect: false, image: ITEMS.FREEDOM_1 },
-            { id: '2', text: 'Forbidden to speak against government', isCorrect: true, image: ITEMS.FREEDOM_2 },
-            { id: '3', text: 'Forbidden to criticize institutions', isCorrect: true, image: ITEMS.FREEDOM_3 },
-            { id: '4', text: 'Allowed to write review in newspaper', isCorrect: false, image: ITEMS.FREEDOM_4 }
+            { id: '1', text: 'Allowed to express unpopular opinion', isCorrect: false },
+            { id: '2', text: 'Forbidden to speak against government', isCorrect: true },
+            { id: '3', text: 'Forbidden to criticize institutions', isCorrect: true },
+            { id: '4', text: 'Allowed to write review in newspaper', isCorrect: false }
           ]
         },
         decisionQuestion: 'Mission Complete',
