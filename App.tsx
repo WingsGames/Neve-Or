@@ -37,50 +37,20 @@ const App: React.FC = () => {
     signIn();
   }, []);
 
-  // 2. Load from LocalStorage
+  // 2. Reset on Start (Per user request: always start fresh)
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (!parsed || !Array.isArray(parsed.nodes)) throw new Error("Invalid save data structure");
-
-        const freshNodes = getInitialNodes('he'); 
-        const mergedNodes = freshNodes.map(freshNode => {
-             const savedNode = parsed.nodes.find((n: any) => n.id === freshNode.id);
-             if (savedNode) {
-                 return {
-                     ...freshNode,
-                     isLocked: savedNode.isLocked,
-                     isCompleted: savedNode.isCompleted,
-                     data: {
-                         ...freshNode.data,
-                         backgroundImage: (typeof savedNode.data?.backgroundImage === 'string') ? savedNode.data.backgroundImage : freshNode.data.backgroundImage,
-                         characterImages: (savedNode.data?.characterImages) ? savedNode.data.characterImages : freshNode.data.characterImages,
-                         subScenes: (savedNode.data?.subScenes && Array.isArray(savedNode.data.subScenes) && freshNode.data.subScenes) 
-                            ? freshNode.data.subScenes.map((freshSub: any) => {
-                                const savedSub = savedNode.data.subScenes.find((s: any) => s.id === freshSub.id);
-                                return savedSub ? { ...freshSub, backgroundImage: savedSub.backgroundImage || freshSub.backgroundImage } : freshSub;
-                            })
-                            : freshNode.data.subScenes,
-                     }
-                 };
-             }
-             return freshNode;
-        });
-
-        setState(prev => ({
-            ...prev,
-            nodes: mergedNodes,
-            score: typeof parsed.score === 'number' ? parsed.score : 0
-        }));
-      }
+      // Instead of loading, we explicitly clear the storage to ensure a fresh start
+      localStorage.removeItem(STORAGE_KEY);
+      console.log("Game state reset on startup.");
     } catch (e) {
-      console.warn("Corrupted local save detected or empty. Starting fresh.", e);
+      console.warn("Failed to clear local storage", e);
     }
   }, []);
 
-  // 3. Save to LocalStorage
+  // 3. Save to LocalStorage (Still save during the session so reload works if needed, 
+  // but next proper 'start' will wipe it due to the logic above if the effect runs on mount)
+  // Actually, if we want it to reset on *every* open (refresh), the above effect handles it.
   useEffect(() => {
      try {
        const stateToSave = {
@@ -284,7 +254,7 @@ const App: React.FC = () => {
          </div>
 
          <div className="absolute bottom-4 left-4 text-gray-400 text-[10px] font-sans font-bold z-20 opacity-60">
-           v2.1
+           v2.2
          </div>
        </div>
      );
