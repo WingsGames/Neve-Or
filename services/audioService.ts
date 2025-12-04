@@ -29,7 +29,7 @@ const createGain = (ctx: AudioContext, startVol: number, endVol: number, duratio
   return gain;
 };
 
-export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover' | 'victory') => {
+export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover' | 'victory' | 'transition' | 'unlock' | 'bubble' | 'snap' | 'modal_open') => {
   try {
     const ctx = initAudio();
     const t = ctx.currentTime;
@@ -47,15 +47,71 @@ export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover' | 
         }
         break;
 
-      case 'hover':
-        // Very subtle blip for hovers
+      case 'snap':
+        // Sharp, short mechanical click
         {
-          const osc = createOscillator(ctx, 'sine', 400);
+          const osc = createOscillator(ctx, 'square', 800);
           const gain = createGain(ctx, 0.02, 0.001, 0.05);
           osc.connect(gain);
           gain.connect(ctx.destination);
           osc.start(t);
           osc.stop(t + 0.05);
+        }
+        break;
+
+      case 'hover':
+        // Very subtle blip for hovers
+        {
+          const osc = createOscillator(ctx, 'sine', 400);
+          const gain = createGain(ctx, 0.01, 0.001, 0.05);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.05);
+        }
+        break;
+      
+      case 'bubble':
+        // Water drop / bubble pop sound
+        {
+          const osc = createOscillator(ctx, 'sine', 300);
+          const gain = createGain(ctx, 0.1, 0.001, 0.15);
+          osc.frequency.exponentialRampToValueAtTime(600, t + 0.1);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.15);
+        }
+        break;
+
+      case 'transition':
+        // Soft "Woosh" or "Swoosh" using low frequency sine sweep
+        {
+          const osc = createOscillator(ctx, 'sine', 100);
+          const gain = createGain(ctx, 0.05, 0.001, 0.4);
+          
+          osc.frequency.exponentialRampToValueAtTime(300, t + 0.2);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          
+          osc.start(t);
+          osc.stop(t + 0.4);
+        }
+        break;
+
+      case 'unlock':
+        // Magical sparkle / Chime (Rapid arpeggio)
+        {
+           const notes = [880, 1108, 1318, 1760]; // A5, C#6, E6, A6
+           notes.forEach((freq, i) => {
+             const startTime = t + (i * 0.05);
+             const osc = createOscillator(ctx, 'sine', freq);
+             const gain = createGain(ctx, 0.05, 0.001, 0.3);
+             osc.connect(gain);
+             gain.connect(ctx.destination);
+             osc.start(startTime);
+             osc.stop(startTime + 0.3);
+           });
         }
         break;
 
@@ -106,7 +162,7 @@ export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover' | 
         break;
 
       case 'pop':
-        // Bubble pop sound
+        // Bubble pop sound (higher pitch than bubble)
         {
           const osc = createOscillator(ctx, 'sine', 400);
           const gain = createGain(ctx, 0.1, 0.001, 0.15);
@@ -117,6 +173,19 @@ export const playSfx = (type: 'click' | 'success' | 'error' | 'pop' | 'hover' | 
           osc.start(t);
           osc.frequency.exponentialRampToValueAtTime(800, t + 0.1); // Pitch slide up
           osc.stop(t + 0.15);
+        }
+        break;
+      
+      case 'modal_open':
+        // Quick high pitch slide
+        {
+           const osc = createOscillator(ctx, 'sine', 400);
+           const gain = createGain(ctx, 0.1, 0.001, 0.25);
+           osc.frequency.exponentialRampToValueAtTime(800, t + 0.15);
+           osc.connect(gain);
+           gain.connect(ctx.destination);
+           osc.start(t);
+           osc.stop(t + 0.25);
         }
         break;
 

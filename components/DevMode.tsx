@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { GameNode, GameState } from '../types';
 import { STORAGE_KEY } from '../constants';
@@ -278,6 +279,11 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
     }
   };
 
+  const handleUnlockAll = () => {
+    const updatedNodes = gameState.nodes.map(n => ({ ...n, isLocked: false }));
+    onUpdateGameState({ ...gameState, nodes: updatedNodes });
+  };
+
   const storagePercentage = Math.min((storageUsage / 4.8) * 100, 100);
   const storageColor = storagePercentage > 90 ? 'bg-red-500' : storagePercentage > 70 ? 'bg-orange-500' : 'bg-green-500';
 
@@ -299,6 +305,7 @@ export const DevMode: React.FC<Props> = ({ gameState, onUpdateGameState, onClose
                 <div className={`h-full ${storageColor} transition-all duration-500`} style={{ width: `${storagePercentage}%` }}></div>
              </div>
           </div>
+          <Button variant="secondary" onClick={handleUnlockAll} className="py-1 px-3 text-sm bg-green-100 text-green-700 hover:bg-green-200 border-none shadow-none">🔓 פתח הכל</Button>
           <Button variant="secondary" onClick={handleResetData} className="py-1 px-3 text-sm bg-red-100 text-red-600 hover:bg-red-200 border-none shadow-none">איפוס</Button>
           <Button variant="danger" onClick={onClose} className="py-1 px-3 text-sm">סגור</Button>
         </div>

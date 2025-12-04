@@ -232,7 +232,7 @@ const HE_NODES: GameNode[] = [
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 88, y: 35 },
+      coordinates: { x: 85, y: 35 },
       data: {
         description: 'תמרה, תלמידת י\', כותבת פוסט בפייסבוק נגד המנהלת שביטלה את מועצת התלמידים ללא התייעצות. היא מכנה אותה "דיקטטורית".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -306,7 +306,7 @@ const HE_NODES: GameNode[] = [
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 50, y: 85 },
+      coordinates: { x: 50, y: 75 },
       data: {
         description: 'אתם עכשיו שופטי בג"ץ. העיתון עתר נגד שר הפנים.',
         backgroundImage: IMG.COURT,
@@ -571,7 +571,7 @@ const AR_NODES: GameNode[] = [
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 88, y: 35 },
+      coordinates: { x: 85, y: 35 },
       data: {
         description: 'كتبت ربى، طالبة في الصف العاشر، منشورًا على فيسبوك تنتقد فيه بشدّة المديرة التي ألغت مجلس الطلّاب، ووصفتها بـ"الديكتاتورية".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -645,7 +645,7 @@ const AR_NODES: GameNode[] = [
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 50, y: 85 },
+      coordinates: { x: 50, y: 75 },
       data: {
         description: 'أنتم الآن قضاة المحكمة العليا. التمست الصحيفة ضد وزير الداخلية.',
         backgroundImage: IMG.COURT,
@@ -910,7 +910,7 @@ In other words, public security does not automatically override the right to pri
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 88, y: 35 },
+      coordinates: { x: 85, y: 35 },
       data: {
         description: 'Tamara, a 10th grade student, writes a Facebook post against the principal who cancelled the Student Council without consultation. She calls her a "Dictator".',
         backgroundImage: IMG.SCHOOL_TAMARA,
@@ -984,7 +984,7 @@ In other words, public security does not automatically override the right to pri
       type: NodeType.SCENARIO,
       isLocked: true, // LOCKED
       isCompleted: false,
-      coordinates: { x: 50, y: 85 },
+      coordinates: { x: 50, y: 75 },
       data: {
         description: 'You are now Supreme Court judges. The newspaper petitioned against the Minister of Interior.',
         backgroundImage: IMG.COURT,
