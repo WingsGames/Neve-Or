@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { getInitialNodes, STORAGE_KEY } from './constants';
 import { GameState, NodeType, Language } from './types';
@@ -249,7 +250,7 @@ const App: React.FC = () => {
          </div>
          
          <div className="absolute bottom-4 left-4 text-gray-400 text-[10px] font-sans font-bold z-20 opacity-60">
-           v2.3
+           v2.5
          </div>
        </div>
      );
@@ -264,14 +265,14 @@ const App: React.FC = () => {
     <div className="fixed inset-0 w-full h-full bg-slate-950 flex items-center justify-center overflow-hidden" dir={dir}>
       <div 
         id="game-container"
-        className="relative w-full h-full mx-auto shadow-2xl bg-slate-900 flex flex-col overflow-hidden transition-all duration-300"
+        className="relative w-full mx-auto shadow-2xl bg-slate-900 flex flex-col overflow-hidden transition-all duration-300"
         style={{
-            // Constrain aspect ratio to keep UI sane.
+            // Constrain aspect ratio to keep key UI sane.
             // If the screen is super wide (like 25:9), we restrict width to match a cinematic 21:9 ratio.
             // If the screen is standard 16:9 or 4:3, it fills normally.
             maxWidth: '177.78vh', // Approx 16:9 ratio based on height
             width: '100%',
-            height: '100%'
+            height: '100dvh' // Use Dynamic Viewport Height to account for mobile bars
         }}
       >
         {state.currentNodeId === 'HUB' ? (
@@ -282,6 +283,7 @@ const App: React.FC = () => {
             onLanguageChange={handleLanguageChange} 
             onOpenDevMode={() => setState(s => ({...s, devMode: true}))}
             onBackToIntro={() => setState(s => ({...s, currentNodeId: null}))}
+            showDevTools={(import.meta as any).env?.DEV}
             />
         ) : activeNode ? (
             <SceneEngine 

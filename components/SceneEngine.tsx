@@ -384,14 +384,15 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                </div>
                
                <div className="flex-1 w-full overflow-y-auto min-h-0 custom-scrollbar p-1">
-                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 content-center h-full">
+                 {/* Removed content-center and h-full to prevent cutoff on small screens */}
+                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {data.subScenes.map(scene => {
                       const isVisited = visitedSubScenes.has(scene.id);
                       return (
                         <button key={scene.id} onClick={() => { playSfx('modal_open'); setActiveSubScene(scene); }}
                           className={`
                             relative overflow-hidden rounded-xl transition-all shadow-md group border flex flex-col
-                            h-full max-h-[140px] hover:scale-[1.02] active:scale-95
+                            w-full aspect-square hover:scale-[1.02] active:scale-95
                             ${isVisited ? 'border-green-400 ring-2 ring-green-200' : 'border-white/50 hover:border-white'}
                           `}
                         >
@@ -418,7 +419,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                </div>
 
                <div className="mt-2 w-full flex justify-center flex-shrink-0 pb-1">
-                 <Button onClick={() => changePhase('DECISION')} disabled={!canProceed} className={`py-1.5 px-6 rounded-full text-xs font-bold shadow-lg border border-white/20 backdrop-blur-sm ${canProceed ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-500/50 cursor-not-allowed'}`}>
+                 <Button onClick={() => changePhase('DECISION')} disabled={!canProceed} className={`py-1.5 px-6 rounded-full text-xs font-bold shadow-lg border border-white/20 backdrop-blur-sm flex-shrink-0 ${canProceed ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-500/50 cursor-not-allowed'}`}>
                    {canProceed ? t('proceedToDecision', language) : `${t('visitMore', language)} ${3 - visitedSubScenes.size}`}
                  </Button>
                </div>

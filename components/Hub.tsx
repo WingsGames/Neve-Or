@@ -10,9 +10,10 @@ interface Props {
   onLanguageChange: (lang: Language) => void;
   onOpenDevMode: () => void;
   onBackToIntro: () => void;
+  showDevTools?: boolean;
 }
 
-export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIntro, onOpenDevMode }) => {
+export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIntro, onOpenDevMode, showDevTools }) => {
   const hubConfig = nodes.find(n => n.id === 'HUB_CONFIG');
   const backgroundImage = hubConfig?.data.backgroundImage;
   const [imgError, setImgError] = useState(false);
@@ -157,24 +158,21 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIn
           <LegendItem color="bg-gray-400" label={t('locked', language)} />
         </div>
 
-        {/* UI Overlay Elements (Buttons) - Absolute to Map Container or Screen? 
-            Let's keep them absolute to the MAP container for neatness, 
-            OR absolute to screen if we want them always accessible even if map is small?
-            Actually, Hub design usually puts them on screen corners. 
-            Let's put them outside the map container to fill the 'dead space' on ultra-wide screens nicely.
-        */}
+        {/* UI Overlay Elements */}
       </div>
 
       {/* Dev Mode Button (Always visible, Outside Map) */}
-      <button 
-        onClick={() => {
-           playSfx('click');
-           onOpenDevMode();
-        }}
-        className="absolute top-4 left-4 z-50 text-[10px] text-white/70 font-bold hover:text-white transition-all bg-black/30 px-3 py-1.5 rounded-full border border-white/10 hover:bg-black/50 hover:scale-105 active:scale-95 flex items-center gap-1.5 backdrop-blur-sm"
-      >
-         <span>🛠️</span> Dev Mode
-      </button>
+      {showDevTools && (
+        <button 
+          onClick={() => {
+             playSfx('click');
+             onOpenDevMode();
+          }}
+          className="absolute top-4 left-4 z-50 text-[10px] text-white/70 font-bold hover:text-white transition-all bg-black/30 px-3 py-1.5 rounded-full border border-white/10 hover:bg-black/50 hover:scale-105 active:scale-95 flex items-center gap-1.5 backdrop-blur-sm"
+        >
+           <span>🛠️</span> Dev Mode
+        </button>
+      )}
 
       {/* Back to Intro Button (Outside Map) */}
       <div className="absolute top-4 right-4 z-50">
