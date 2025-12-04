@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameNode, Language } from '../types';
 import { t } from '../utils/i18n';
 import { playSfx } from '../services/audioService';
@@ -19,8 +18,23 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIn
   const [imgError, setImgError] = useState(false);
   const activeNodes = nodes.filter(n => n.type !== 'INTRO' && n.type !== 'HUB' && n.coordinates);
 
+  // Sound effect when Hub mounts (entering map)
+  useEffect(() => {
+    // Determine if there is a newly unlocked level (last completed index + 1 is unlocked?)
+    const completedCount = nodes.filter(n => n.isCompleted).length;
+    // Just a subtle entrance sound
+    playSfx('transition');
+    
+    // Check if we just unlocked something? (Simple heuristic: if the latest unlocked node is not completed)
+    const latestUnlocked = activeNodes.filter(n => !n.isLocked && !n.isCompleted);
+    if (latestUnlocked.length > 0) {
+        // Maybe play unlock sound if it's "fresh"? 
+        // For now, let's keep it simple.
+    }
+  }, []);
+
   return (
-    <div className="fixed inset-0 w-full h-full bg-slate-900 overflow-hidden font-sans select-none flex items-center justify-center">
+    <div className="fixed inset-0 w-full h-full bg-slate-900 overflow-hidden font-sans select-none flex items-center justify-center animate-fade-in">
       
       {/* 1. Blurred Background Layer (Fills screen) */}
       <div className="absolute inset-0 z-0 opacity-50">
@@ -37,7 +51,7 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIn
       </div>
 
       {/* 2. Main Map Container (Constrained Aspect Ratio 16:9) */}
-      <div className="relative z-10 w-full max-w-[1600px] aspect-video bg-slate-800 shadow-2xl sm:rounded-2xl overflow-hidden border border-white/10 mx-auto">
+      <div className="relative z-10 w-full max-w-[1600px] aspect-video bg-slate-800 shadow-2xl sm:rounded-2xl overflow-hidden border border-white/10 mx-auto animate-zoom-in">
         
         {/* Map Image */}
         <div className="absolute inset-0">
@@ -97,10 +111,10 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIn
                   
                   {isActive && (
                     <>
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white animate-bounce z-40 whitespace-nowrap">
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-full shadow-lg border border-white animate-bounce z-40 whitespace-nowrap transition-opacity duration-300 group-hover/pin:opacity-0">
                         {language === 'he' ? '!חדש' : 'New!'}
                       </div>
-                      <div className="absolute inset-0 rounded-3xl ring-4 ring-blue-400 animate-ping opacity-50"></div>
+                      <div className="absolute inset-0 rounded-3xl ring-4 ring-blue-400 animate-ping opacity-50 group-hover/pin:opacity-0"></div>
                     </>
                   )}
 
@@ -118,7 +132,7 @@ export const Hub: React.FC<Props> = ({ nodes, onNodeSelect, language, onBackToIn
                   <div className={`
                     absolute px-4 py-2 bg-white/95 backdrop-blur-md rounded-xl shadow-xl 
                     text-xs sm:text-sm font-bold text-gray-800 whitespace-nowrap opacity-0 
-                    group-hover/pin:opacity-100 transition-all duration-300 z-30 flex flex-col items-center 
+                    group-hover/pin:opacity-100 transition-all duration-300 z-50 flex flex-col items-center 
                     after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:border-[6px] after:border-transparent pointer-events-none
                     ${isBottom 
                       ? 'bottom-[calc(100%+16px)] translate-y-2 group-hover/pin:translate-y-0 after:-bottom-3 after:border-t-white/95 after:border-b-transparent' 

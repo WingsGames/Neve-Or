@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { getInitialNodes, STORAGE_KEY } from './constants';
 import { GameState, NodeType, Language } from './types';
@@ -249,12 +248,8 @@ const App: React.FC = () => {
            </div>
          </div>
          
-         <div className="absolute bottom-4 text-white/40 text-xs font-mono z-10">
-           Neve Or Human Rights Simulator © 2025
-         </div>
-
          <div className="absolute bottom-4 left-4 text-gray-400 text-[10px] font-sans font-bold z-20 opacity-60">
-           v2.2
+           v2.3
          </div>
        </div>
      );
