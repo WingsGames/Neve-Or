@@ -267,9 +267,22 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
     // 2. Main Phase Navigation Reverse Logic
     if (phase === 'DECISION_PHASE_2') {
+        // If an option is selected, reset it first
+        if (selectedOption) {
+            setSelectedOption(null);
+            setFeedbackText('');
+            return;
+        }
         changePhase('DECISION', 'back');
         setSelectedOption(null);
     } else if (phase === 'DECISION') {
+        // If an option is selected, reset it first
+        if (selectedOption) {
+            setSelectedOption(null);
+            setFeedbackText('');
+            return;
+        }
+        
         if (node.data.interactionType !== InteractionType.NONE) {
             changePhase('INTERACTION', 'back');
         } else if (node.data.dialog.length > 0) {
@@ -402,35 +415,35 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                  </h3>
                </div>
                
-               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar p-2 items-center content-center">
+               <div className="flex flex-wrap justify-center gap-2 w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar p-1 items-center content-center">
                  {data.subScenes.map(scene => {
                    const isVisited = visitedSubScenes.has(scene.id);
                    return (
                      <button key={scene.id} onClick={() => { playSfx('modal_open'); setActiveSubScene(scene); }}
                        className={`
-                         relative overflow-hidden rounded-2xl transition-all shadow-lg group border-2 flex flex-col
-                         aspect-[3/4] hover:scale-105 active:scale-95 mx-auto w-full max-w-[180px]
+                         relative overflow-hidden rounded-xl transition-all shadow-md group border flex flex-col
+                         w-[42%] sm:w-[22%] aspect-square hover:scale-[1.02] active:scale-95
                          ${isVisited ? 'border-green-400 ring-2 ring-green-200' : 'border-white/50 hover:border-white'}
                        `}
                      >
-                        <div className="h-2/3 w-full relative overflow-hidden bg-slate-800 flex-shrink-0">
+                        <div className="h-[65%] w-full relative overflow-hidden bg-slate-800 flex-shrink-0">
                            {scene.backgroundImage ? (
                              <img src={scene.backgroundImage} className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${isVisited ? 'grayscale-[50%]' : ''}`} alt="" />
                            ) : (
                              <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
                            )}
-                           <div className="absolute top-2 right-2 text-3xl drop-shadow-md">{scene.icon}</div>
+                           <div className="absolute top-1 right-1 text-2xl drop-shadow-md">{scene.icon}</div>
                            
                            {isVisited && (
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
-                                 <div className="bg-green-500 text-white rounded-full p-2 shadow-lg border-2 border-white">✓</div>
+                                 <div className="bg-green-500 text-white rounded-full p-1.5 shadow-lg border-2 border-white">✓</div>
                               </div>
                            )}
                         </div>
 
-                        <div className={`h-1/3 w-full flex flex-col items-center justify-center p-2 text-center transition-colors flex-grow ${isVisited ? 'bg-slate-100' : 'bg-white/95 backdrop-blur-md'}`}>
-                           <span className="font-black text-xs sm:text-sm text-blue-900 leading-tight mb-1">{scene.title}</span>
-                           <span className={`text-[10px] font-bold uppercase tracking-wider ${isVisited ? 'text-green-600' : 'text-blue-500'}`}>
+                        <div className={`h-[35%] w-full flex flex-col items-center justify-center p-1 text-center transition-colors flex-grow ${isVisited ? 'bg-slate-100' : 'bg-white/95 backdrop-blur-md'}`}>
+                           <span className="font-black text-xs text-blue-900 leading-none mb-0.5">{scene.title}</span>
+                           <span className={`text-[9px] font-bold uppercase tracking-wider ${isVisited ? 'text-green-600' : 'text-blue-500'}`}>
                              {isVisited ? t('visited', language) : t('clickToListen', language)}
                            </span>
                         </div>
@@ -439,7 +452,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                  })}
                </div>
 
-               <div className="mt-2 w-full flex justify-center flex-shrink-0 pb-4">
+               <div className="mt-2 w-full flex justify-center flex-shrink-0 pb-2">
                  <Button onClick={() => changePhase('DECISION')} disabled={!canProceed} className={`py-1.5 px-6 rounded-full text-xs font-bold shadow-lg border border-white/20 backdrop-blur-sm ${canProceed ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-500/50 cursor-not-allowed'}`}>
                    {canProceed ? t('proceedToDecision', language) : `${t('visitMore', language)} ${3 - visitedSubScenes.size}`}
                  </Button>
