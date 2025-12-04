@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useEffect } from 'react';
 import { getInitialNodes, STORAGE_KEY } from './constants';
 import { GameState, NodeType, Language } from './types';
@@ -238,7 +240,7 @@ const App: React.FC = () => {
      if (!introNode) return <div className="flex items-center justify-center h-screen bg-slate-900 text-white">Error: Intro content not found</div>;
 
      return (
-       <div className="h-[100dvh] w-full bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden" dir={dir}>
+       <div className="h-screen w-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden" dir={dir}>
          {/* Background Layer */}
          {introNode.data.backgroundImage && (
            <div className="absolute inset-0 z-0 animate-fade-in">
@@ -288,7 +290,7 @@ const App: React.FC = () => {
 
   // --- GENERAL APP LAYOUT ---
   return (
-    <div className="w-full h-[100dvh] overflow-hidden bg-slate-900" dir={dir}>
+    <div className="w-screen h-screen overflow-hidden bg-slate-900" dir={dir}>
        {state.currentNodeId === 'HUB' ? (
          <Hub 
            nodes={state.nodes} 

@@ -1,4 +1,7 @@
 
+
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GameNode, InteractionType, Language, SubScene } from '../types';
 import { Button } from './ui/Button';
@@ -14,9 +17,11 @@ interface Props {
 }
 
 type Phase = 'INTRO' | 'DIALOG' | 'INTERACTION' | 'DECISION' | 'DECISION_PHASE_2';
+type TransitionDirection = 'forward' | 'back';
 
 export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, language }) => {
   const [phase, setPhase] = useState<Phase>('INTRO');
+  const [transitionDir, setTransitionDir] = useState<TransitionDirection>('forward');
   const [feedbackText, setFeedbackText] = useState<string>('');
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [showDigitalContentModal, setShowDigitalContentModal] = useState(false); // New state for modal
@@ -42,6 +47,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
   useEffect(() => {
     setPhase('INTRO');
+    setTransitionDir('forward');
     setShowIntroCard(false); // Reset intro card visibility
     setInteractionComplete(false);
     setCodeStep(0);
@@ -68,6 +74,20 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
     }
   }, [node]);
 
+  // Audio & Animation effect when Phase changes
+  useEffect(() => {
+     if (phase !== 'INTRO') {
+        playSfx('transition');
+     }
+  }, [phase]);
+
+  // Sound effects for modals
+  useEffect(() => {
+    if (showMoreInfo || showDigitalContentModal) {
+      playSfx('modal_open');
+    }
+  }, [showMoreInfo, showDigitalContentModal]);
+
   // Timer logic for Intro Phase
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -77,6 +97,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
       // Wait 4 seconds before showing card
       timer = setTimeout(() => {
         setShowIntroCard(true);
+        playSfx('bubble');
       }, 4000);
     } else {
       // If we move past INTRO, ensure card is visible immediately if accessed later
@@ -88,10 +109,16 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
     };
   }, [phase]);
 
+  const changePhase = (newPhase: Phase, dir: TransitionDirection = 'forward') => {
+    setTransitionDir(dir);
+    setPhase(newPhase);
+  };
+
   // Allow clicking background to skip delay
   const handleBackgroundClick = () => {
     if (phase === 'INTRO' && !showIntroCard) {
       setShowIntroCard(true);
+      playSfx('bubble');
     }
   };
 
@@ -109,7 +136,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
   const handleShieldClick = (item: any) => {
     if (item.isDanger) {
-      playSfx('success');
+      playSfx('snap'); // Nice mechanical snap sound for protecting
       setInteractionItems(prev => prev.map(i => i.id === item.id ? { ...i, protected: true } : i));
     } else {
       playSfx('error');
@@ -154,7 +181,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
       setTimeout(() => setErrorShake(false), 800);
       return;
     }
-    playSfx('success');
+    playSfx('snap');
     setCodeFeedbackText(explanation);
     setPendingDigit(value);
     setShowCodeFeedback(true);
@@ -193,7 +220,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
     const badgePositionClass = isRTL ? 'left-0 rounded-br-2xl' : 'right-0 rounded-bl-2xl';
 
     return (
-      <div className={`bg-white/95 backdrop-blur-md rounded-2xl shadow-xl relative overflow-hidden w-full ${compact ? 'p-2' : 'p-4 sm:p-5'}`}>
+      <div className={`bg-white/95 backdrop-blur-md rounded-2xl shadow-xl relative overflow-hidden w-full animate-pop-in ${compact ? 'p-2' : 'p-4 sm:p-5'}`}>
         <div className={`absolute top-0 ${badgePositionClass} bg-yellow-400 text-blue-900 text-[9px] sm:text-xs font-black px-3 py-1 shadow-sm z-10 uppercase tracking-wide`}>
           {badgeLabel}
         </div>
@@ -221,11 +248,12 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
   const handleDecisionComplete = () => {
     if (phase === 'DECISION' && node.data.secondaryDecisionQuestion) {
-      setPhase('DECISION_PHASE_2');
+      changePhase('DECISION_PHASE_2', 'forward');
       setSelectedOption(null);
       setFeedbackText('');
       setShowMoreInfo(false);
     } else {
+      playSfx('unlock');
       onComplete();
     }
   };
@@ -242,26 +270,26 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
     // 2. Main Phase Navigation Reverse Logic
     if (phase === 'DECISION_PHASE_2') {
-        setPhase('DECISION');
+        changePhase('DECISION', 'back');
         setSelectedOption(null);
     } else if (phase === 'DECISION') {
         if (node.data.interactionType !== InteractionType.NONE) {
-            setPhase('INTERACTION');
+            changePhase('INTERACTION', 'back');
         } else if (node.data.dialog.length > 0) {
-            setPhase('DIALOG');
+            changePhase('DIALOG', 'back');
         } else {
-            setPhase('INTRO');
+            changePhase('INTRO', 'back');
             setShowIntroCard(true); 
         }
     } else if (phase === 'INTERACTION') {
         if (node.data.dialog.length > 0) {
-            setPhase('DIALOG');
+            changePhase('DIALOG', 'back');
         } else {
-            setPhase('INTRO');
+            changePhase('INTRO', 'back');
             setShowIntroCard(true);
         }
     } else if (phase === 'DIALOG') {
-        setPhase('INTRO');
+        changePhase('INTRO', 'back');
         setShowIntroCard(true);
     }
   };
@@ -269,6 +297,9 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
   // Check if we should skip the decision phase (if it's just a "Continue" button)
   const isTrivialDecision = node.data.options.length === 1;
   const trivialOption = isTrivialDecision ? node.data.options[0] : null;
+
+  // Determine animation class based on direction
+  const animClass = transitionDir === 'back' ? 'animate-slide-in-left' : 'animate-slide-in-right';
 
   // --- RENDER CONTENT ---
   const renderContent = () => {
@@ -290,10 +321,14 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
             );
         }
 
+        // If coming back to intro, maybe slide in left? But standard zoom-in is usually nice for cards.
+        // Let's use animClass if it's 'back', else zoomIn
+        const introAnim = transitionDir === 'back' ? 'animate-slide-in-left' : 'animate-zoom-in';
+
         return (
-          <div className="flex flex-col h-full w-full justify-center items-center">
+          <div className="flex flex-col h-full w-full justify-center items-center p-2">
             {/* Compact Fit */}
-            <div className="bg-white/85 backdrop-blur-xl rounded-2xl shadow-2xl w-fit max-w-lg flex flex-col max-h-full overflow-hidden animate-fade-in-up border border-white/40">
+            <div className={`bg-white/85 backdrop-blur-xl rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-full overflow-hidden ${introAnim} border border-white/40`}>
               <div className="px-4 py-2 flex justify-between items-center gap-2 flex-shrink-0 bg-white/50 border-b border-gray-100/50">
                 <h2 className="text-sm sm:text-lg font-black truncate text-blue-900">{node.title}</h2>
                 <div className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold shadow-sm">
@@ -307,7 +342,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
               </div>
               
               <div className="p-3 flex justify-center flex-shrink-0 bg-white/50 border-t border-gray-100/50">
-                <Button fullWidth onClick={() => setPhase(data.dialog.length > 0 ? 'DIALOG' : (data.interactionType !== InteractionType.NONE ? 'INTERACTION' : 'DECISION'))} className="py-2 text-sm font-black shadow-lg rounded-xl">
+                <Button fullWidth onClick={() => changePhase(data.dialog.length > 0 ? 'DIALOG' : (data.interactionType !== InteractionType.NONE ? 'INTERACTION' : 'DECISION'))} className="py-2 text-sm font-black shadow-lg rounded-xl">
                   {t('next', language)}
                 </Button>
               </div>
@@ -317,14 +352,15 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
       case 'DIALOG':
         return (
-          <div className="flex flex-col h-full w-full max-w-3xl mx-auto relative overflow-hidden">
-            <div className="flex-1 overflow-y-auto min-h-0 p-1 mask-image-linear-gradient custom-scrollbar">
+          <div className={`flex flex-col h-full w-full max-w-4xl mx-auto relative overflow-hidden ${animClass}`}>
+            <div className="flex-1 overflow-y-auto min-h-0 p-1 mask-image-linear-gradient custom-scrollbar pb-16">
               {data.dialog.map((msg) => (
                 <ChatBubble key={msg.id} message={msg} avatarUrl={data.characterImages?.[msg.speaker]} />
               ))}
             </div>
-            <div className="flex justify-center flex-shrink-0 pt-1 sticky bottom-0 z-30">
-              <Button onClick={() => setPhase(data.interactionType !== InteractionType.NONE ? 'INTERACTION' : 'DECISION')} className="py-1.5 px-6 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-sm font-bold border-2 border-white/20 backdrop-blur-sm">
+            {/* Footer with Button - Fixed Height & Sticky */}
+            <div className="flex justify-center flex-shrink-0 py-2 sticky bottom-0 z-30 bg-gradient-to-t from-slate-900/50 to-transparent">
+              <Button onClick={() => changePhase(data.interactionType !== InteractionType.NONE ? 'INTERACTION' : 'DECISION')} className="py-1.5 px-6 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-sm font-bold border-2 border-white/20 backdrop-blur-sm">
                 {data.interactionType !== InteractionType.NONE ? t('challenge', language) : t('next', language)}
               </Button>
             </div>
@@ -336,7 +372,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         if (data.interactionType === InteractionType.CITY_HALL_SUB_LOCATIONS && data.subScenes) {
           if (activeSubScene) {
             return (
-              <div className="absolute inset-0 z-50 flex flex-col animate-fade-in bg-slate-900/50 backdrop-blur-sm">
+              <div className="absolute inset-0 z-50 flex flex-col animate-zoom-in bg-slate-900/50 backdrop-blur-sm">
                  {/* Full bright background for sub-scene */}
                  {activeSubScene.backgroundImage && (
                     <img src={activeSubScene.backgroundImage} className="absolute inset-0 w-full h-full object-cover z-0" alt="" />
@@ -347,11 +383,11 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                  </div>
                  <button onClick={() => setActiveSubScene(null)} className="absolute top-2 left-2 z-20 bg-black/30 text-white hover:bg-black/50 w-8 h-8 rounded-full flex items-center justify-center font-bold border border-white/30 backdrop-blur-md">✕</button>
                  
-                 <div className="relative z-10 flex flex-col p-3 w-full max-w-2xl mx-auto h-full justify-end pb-12">
-                     <div className="overflow-y-auto max-h-[65vh] p-1 flex flex-col justify-end">
+                 <div className="relative z-10 flex flex-col p-3 w-full max-w-4xl mx-auto h-full justify-end">
+                     <div className="overflow-y-auto flex-1 min-h-0 p-1 flex flex-col justify-end mask-image-linear-gradient custom-scrollbar">
                         {activeSubScene.dialog.map((msg) => <ChatBubble key={msg.id} message={msg} />)}
                      </div>
-                     <div className="flex justify-center mt-2 flex-shrink-0">
+                     <div className="flex justify-center mt-2 flex-shrink-0 pt-2 pb-4">
                         <Button onClick={() => { playSfx('click'); setVisitedSubScenes(prev => new Set(prev).add(activeSubScene.id)); setActiveSubScene(null); }} className="py-2 px-8 rounded-full text-sm font-bold shadow-xl bg-blue-600 text-white border-2 border-white/20">
                            {t('finishedListening', language)}
                          </Button>
@@ -363,25 +399,27 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
           const canProceed = visitedSubScenes.size >= 3; 
           return (
-            <div className="h-full flex flex-col items-center justify-center animate-fade-in max-w-5xl mx-auto w-full relative z-10">
-               <h3 className="text-sm font-black text-white mb-2 text-center drop-shadow-lg bg-black/40 px-4 py-1.5 rounded-xl backdrop-blur-md flex-shrink-0 border border-white/10 w-fit">
-                 {t('chooseLocation', language)}
-               </h3>
+            <div className={`h-full flex flex-col items-center max-w-5xl mx-auto w-full relative z-10 ${animClass}`}>
+               <div className="flex-shrink-0 mb-2">
+                 <h3 className="text-sm font-black text-white text-center drop-shadow-lg bg-black/40 px-4 py-1.5 rounded-xl backdrop-blur-md border border-white/10 w-fit mx-auto">
+                   {t('chooseLocation', language)}
+                 </h3>
+               </div>
                
                {/* Updated Grid for Desktop: 2 cols on small, 4 cols on large. Vertical Cards. */}
-               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar p-2 items-center">
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar p-2 items-center content-center">
                  {data.subScenes.map(scene => {
                    const isVisited = visitedSubScenes.has(scene.id);
                    return (
-                     <button key={scene.id} onClick={() => { playSfx('click'); setActiveSubScene(scene); }}
+                     <button key={scene.id} onClick={() => { playSfx('modal_open'); setActiveSubScene(scene); }}
                        className={`
                          relative overflow-hidden rounded-2xl transition-all shadow-lg group border-2 flex flex-col
-                         aspect-[3/4] sm:aspect-[4/5] hover:scale-105 active:scale-95
+                         aspect-[3/4] hover:scale-105 active:scale-95 mx-auto w-full max-w-[200px]
                          ${isVisited ? 'border-green-400 ring-2 ring-green-200' : 'border-white/50 hover:border-white'}
                        `}
                      >
                         {/* Image Area (Top 2/3) */}
-                        <div className="h-2/3 w-full relative overflow-hidden bg-slate-800">
+                        <div className="h-2/3 w-full relative overflow-hidden bg-slate-800 flex-shrink-0">
                            {scene.backgroundImage ? (
                              <img src={scene.backgroundImage} className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${isVisited ? 'grayscale-[50%]' : ''}`} alt="" />
                            ) : (
@@ -398,7 +436,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                         </div>
 
                         {/* Text Area (Bottom 1/3) */}
-                        <div className={`h-1/3 w-full flex flex-col items-center justify-center p-2 text-center transition-colors ${isVisited ? 'bg-slate-100' : 'bg-white/95 backdrop-blur-md'}`}>
+                        <div className={`h-1/3 w-full flex flex-col items-center justify-center p-2 text-center transition-colors flex-grow ${isVisited ? 'bg-slate-100' : 'bg-white/95 backdrop-blur-md'}`}>
                            <span className="font-black text-xs sm:text-sm text-blue-900 leading-tight mb-1">{scene.title}</span>
                            <span className={`text-[10px] font-bold uppercase tracking-wider ${isVisited ? 'text-green-600' : 'text-blue-500'}`}>
                              {isVisited ? t('visited', language) : t('clickToListen', language)}
@@ -409,8 +447,8 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                  })}
                </div>
 
-               <div className="mt-2 w-full flex justify-center flex-shrink-0">
-                 <Button onClick={() => setPhase('DECISION')} disabled={!canProceed} className={`py-1.5 px-6 rounded-full text-xs font-bold shadow-lg border border-white/20 backdrop-blur-sm ${canProceed ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-500/50 cursor-not-allowed'}`}>
+               <div className="mt-2 w-full flex justify-center flex-shrink-0 pb-4">
+                 <Button onClick={() => changePhase('DECISION')} disabled={!canProceed} className={`py-1.5 px-6 rounded-full text-xs font-bold shadow-lg border border-white/20 backdrop-blur-sm ${canProceed ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gray-500/50 cursor-not-allowed'}`}>
                    {canProceed ? t('proceedToDecision', language) : `${t('visitMore', language)} ${3 - visitedSubScenes.size}`}
                  </Button>
                </div>
@@ -421,24 +459,24 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         // 2. MULTIPLE CHOICE
         if (data.interactionType === InteractionType.MULTIPLE_CHOICE && data.interactionData?.question) {
            return (
-             <div className="h-full w-full flex flex-col items-center overflow-hidden animate-fade-in relative">
-                <div className="flex-shrink-0 mb-1 z-10 max-w-[98%]">
+             <div className={`h-full w-full flex flex-col items-center overflow-hidden relative ${animClass}`}>
+                <div className="flex-shrink-0 mb-2 z-10 max-w-[98%] mt-2">
                    {/* w-fit for question */}
                    <div className="bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg p-3 text-center border border-white/40 w-fit mx-auto">
                       <h3 className="text-xs sm:text-sm font-black relative z-10 leading-tight">{data.interactionData.question}</h3>
                    </div>
                 </div>
-                <div className="flex-1 min-h-0 flex flex-col items-center relative w-full overflow-hidden">
+                
+                <div className="flex-1 min-h-0 w-full max-w-2xl flex flex-col items-center relative overflow-hidden">
                   {!interactionComplete ? (
-                     // w-fit for list
-                     <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-1 p-0.5 w-fit max-w-full">
+                     <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 p-2 w-full">
                         {data.interactionData.answers.map((ans: any) => {
                           const isSelected = selectedAnswerId === ans.id;
                           const isError = isSelected && !ans.correct && shakeId === ans.id;
                           return (
                             <button key={ans.id} onClick={() => handleMultipleChoice(ans)}
-                              className={`py-1.5 px-4 rounded-lg font-bold text-[10px] sm:text-sm transition-all flex justify-between items-center text-start shadow-sm shrink-0 min-h-[30px] leading-tight backdrop-blur-sm w-full
-                                ${isSelected && ans.correct ? 'bg-green-500 text-white' : isError ? 'bg-red-500 text-white animate-shake' : 'bg-white/90 text-gray-800 hover:bg-white'}
+                              className={`py-3 px-4 rounded-xl font-bold text-sm transition-all flex justify-between items-center text-start shadow-sm shrink-0 min-h-[50px] leading-tight backdrop-blur-sm w-full
+                                ${isSelected && ans.correct ? 'bg-green-500 text-white' : isError ? 'bg-red-500 text-white animate-shake' : 'bg-white/90 text-gray-800 hover:bg-white hover:scale-[1.01]'}
                               `}
                             >
                               <span className="flex-1">{ans.text}</span>
@@ -448,12 +486,12 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                         })}
                      </div>
                   ) : (
-                     <div className="flex-1 flex flex-col items-center justify-center animate-fade-in p-2">
+                     <div className="flex-1 flex flex-col items-center justify-center animate-pop-in p-2">
                         {/* Compact success card */}
-                        <div className="bg-white/90 backdrop-blur-xl p-3 rounded-2xl shadow-2xl text-center w-fit max-w-xs border border-white/50">
+                        <div className="bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-2xl text-center w-fit max-w-xs border border-white/50">
                            <div className="text-3xl mb-1 animate-bounce">✅</div>
                            <h3 className="text-sm font-black text-blue-900 mb-2">{t('correct', language)}</h3>
-                           <Button fullWidth className="py-1.5 text-xs shadow-xl bg-blue-600 text-white rounded-xl" onClick={() => setPhase('DECISION')}>{t('next', language)}</Button>
+                           <Button fullWidth className="py-2 text-xs shadow-xl bg-blue-600 text-white rounded-xl" onClick={() => changePhase('DECISION')}>{t('next', language)}</Button>
                         </div>
                      </div>
                   )}
@@ -464,23 +502,26 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
         // 3. SHIELD (Node 2)
         if (data.interactionType === InteractionType.DRAG_SHIELD) {
+            // Usually minigames should "Zoom In" to focus
             return (
-                <div className="h-full w-full flex flex-col items-center relative animate-fade-in">
-                    {!interactionComplete && <h3 className="text-center bg-black/40 text-white backdrop-blur-md rounded-full py-1 px-4 self-center mb-2 text-xs font-bold border border-white/10 w-fit">{t('shieldInst', language)}</h3>}
+                <div className="h-full w-full flex flex-col items-center relative animate-zoom-in">
+                    <div className="flex-shrink-0 mb-2 mt-2">
+                        {!interactionComplete && <h3 className="text-center bg-black/40 text-white backdrop-blur-md rounded-full py-1 px-4 self-center text-xs font-bold border border-white/10 w-fit">{t('shieldInst', language)}</h3>}
+                    </div>
                     
                     {/* Grid updated to much smaller container (max-w-xl) and smaller grid items */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1 overflow-y-auto min-h-0 p-1 w-full max-w-xl items-center content-center">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1 overflow-y-auto min-h-0 p-2 w-full max-w-4xl items-center content-center">
                         {interactionItems.map((item) => (
                             <button 
                                 key={item.id} 
                                 onClick={() => handleShieldClick(item)}
                                 disabled={item.protected}
-                                className={`relative rounded-xl flex flex-col items-center text-center shadow-lg transition-all w-full overflow-hidden group max-w-[150px] mx-auto
+                                className={`relative rounded-xl flex flex-col items-center text-center shadow-lg transition-all w-full overflow-hidden group max-w-[180px] mx-auto h-full max-h-[180px]
                                     ${item.protected ? 'bg-green-100/90 border-2 border-green-500' : shakeId === item.id ? 'bg-red-50/90 border-2 border-red-300 animate-shake' : 'bg-white/95 backdrop-blur-sm hover:scale-[1.02]'}
                                 `}
                             >
                                 {/* Image on TOP - changed to object-contain and reduced height to prevent crop */}
-                                <div className="w-full h-20 bg-white relative p-1">
+                                <div className="w-full flex-1 bg-white relative p-1 min-h-[80px]">
                                     {item.image ? (
                                         <img src={item.image} className="w-full h-full object-contain" alt="" />
                                     ) : (
@@ -490,7 +531,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                 </div>
 
                                 {/* Text Below */}
-                                <div className="p-1.5 w-full flex-1 flex items-center justify-center min-h-[36px] bg-slate-50 border-t border-slate-100">
+                                <div className="p-2 w-full flex-shrink-0 flex items-center justify-center min-h-[40px] bg-slate-50 border-t border-slate-100">
                                      <span className="text-[10px] font-bold text-gray-900 leading-tight">{item.text}</span>
                                 </div>
                             </button>
@@ -498,7 +539,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                     </div>
                     
                     {interactionComplete && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-20 animate-fade-in">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-20 animate-pop-in">
                             {/* Compact card */}
                             <div className="bg-white/95 p-3 rounded-2xl text-center shadow-2xl w-fit max-w-xs border border-white/50">
                                 <div className="text-3xl mb-1">🛡️</div>
@@ -508,7 +549,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                         {trivialOption.feedback}
                                     </div>
                                 ) : null}
-                                <Button fullWidth onClick={() => isTrivialDecision ? onComplete() : setPhase('DECISION')} className="shadow-lg py-1.5 text-xs">
+                                <Button fullWidth onClick={() => isTrivialDecision ? onComplete() : changePhase('DECISION')} className="shadow-lg py-1.5 text-xs">
                                     {isTrivialDecision ? t('finishLevel', language) : t('next', language)}
                                 </Button>
                             </div>
@@ -521,11 +562,14 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         // 4. BALLOONS (Node 4)
         if (data.interactionType === InteractionType.BALLOONS) {
             return (
-                <div className="h-full w-full flex flex-col relative overflow-hidden rounded-xl">
+                <div className="h-full w-full flex flex-col relative overflow-hidden rounded-xl animate-zoom-in">
                     {/* Fallback Sky Gradient if no image is present */}
                     <div className="absolute inset-0 bg-gradient-to-b from-blue-300 via-blue-200 to-white opacity-60 -z-10"></div>
                     
-                    {!interactionComplete && <h3 className="text-center bg-black/40 text-white backdrop-blur-md rounded-full py-1 px-4 self-center mb-2 text-xs font-bold z-10 shadow-md border border-white/10 w-fit">{t('balloonsInst', language)}</h3>}
+                    <div className="flex-shrink-0 mt-2 mb-2 text-center">
+                        {!interactionComplete && <h3 className="inline-block bg-black/40 text-white backdrop-blur-md rounded-full py-1 px-4 text-xs font-bold z-10 shadow-md border border-white/10">{t('balloonsInst', language)}</h3>}
+                    </div>
+                    
                     <div className="flex-1 relative w-full h-full">
                         {interactionItems.map((item, index) => {
                              if (item.popped) return null;
@@ -556,7 +600,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                         })}
                     </div>
                     {interactionComplete && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-20 animate-fade-in">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-20 animate-pop-in">
                             {/* Compact card */}
                             <div className="bg-white/95 p-3 rounded-2xl text-center shadow-2xl w-fit max-w-xs border border-white/50">
                                 <div className="text-3xl mb-1">🎈</div>
@@ -566,7 +610,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                         {trivialOption.feedback}
                                     </div>
                                 ) : null}
-                                <Button fullWidth onClick={() => isTrivialDecision ? onComplete() : setPhase('DECISION')} className="shadow-lg py-1.5 text-xs">
+                                <Button fullWidth onClick={() => isTrivialDecision ? onComplete() : changePhase('DECISION')} className="shadow-lg py-1.5 text-xs">
                                     {isTrivialDecision ? t('finishLevel', language) : t('next', language)}
                                 </Button>
                             </div>
@@ -583,7 +627,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
             // Success Screen (Code Cracked)
             if (interactionComplete) {
                 return (
-                    <div className="h-full w-full flex flex-col items-center justify-center relative animate-fade-in overflow-hidden">
+                    <div className="h-full w-full flex flex-col items-center justify-center relative animate-zoom-in overflow-hidden">
                         {/* Confetti Effect */}
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
                             {[...Array(40)].map((_, i) => (
@@ -599,7 +643,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                             ))}
                         </div>
 
-                        <div className="bg-white/95 p-4 rounded-2xl shadow-2xl text-center backdrop-blur-xl border border-white/50 w-fit max-w-2xl flex flex-col items-center z-10 max-h-full">
+                        <div className="bg-white/95 p-4 rounded-2xl shadow-2xl text-center backdrop-blur-xl border border-white/50 w-fit max-w-2xl flex flex-col items-center z-10 max-h-full my-auto">
                              <div className="text-4xl mb-2 animate-bounce">🏆</div>
                              <h2 className="text-xl font-black text-blue-900 mb-2">{t('codeCracked', language)}</h2>
                              <div className="bg-green-100 text-green-800 font-mono text-2xl px-4 py-1 rounded-lg mb-4 tracking-[0.5em] border border-green-200 shadow-inner">3242</div>
@@ -611,7 +655,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                 </p>
                              </div>
 
-                             <Button onClick={onComplete} fullWidth className="mt-auto shadow-lg bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-xl animate-pulse">
+                             <Button onClick={onComplete} fullWidth className="mt-auto shadow-lg bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-xl animate-pulse flex-shrink-0">
                                 {t('finishGame', language)}
                              </Button>
                         </div>
@@ -621,9 +665,9 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
             // Question Screen
             return (
-                <div className="h-full w-full flex flex-col relative animate-fade-in items-center">
+                <div className={`h-full w-full flex flex-col relative ${animClass} items-center`}>
                     {/* Header - Compact */}
-                    <div className="w-fit flex justify-between items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl backdrop-blur-md mb-2 border border-white/10 shrink-0">
+                    <div className="w-fit flex justify-between items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl backdrop-blur-md mb-2 mt-2 border border-white/10 shrink-0">
                         <span className="text-white font-mono font-bold text-sm">{t('codeLabel', language)}:</span>
                         <div className="flex gap-1.5">
                             {[0, 1, 2, 3].map(i => (
@@ -635,7 +679,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                     </div>
 
                     {currentQ && (
-                        <div className="flex-1 w-full max-w-2xl bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl flex flex-col overflow-hidden relative border border-white/40 mb-1">
+                        <div className="flex-1 w-full max-w-2xl bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl flex flex-col overflow-hidden relative border border-white/40 mb-4 mx-4 min-h-0">
                              <div className="bg-blue-600 px-2 py-1 text-white text-center font-bold text-xs shrink-0">{t('question', language)} {codeStep + 1} / 4</div>
                              
                              {/* Question Title */}
@@ -644,7 +688,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                              </div>
                              
                              {showCodeFeedback ? (
-                                 <div className="flex-1 flex flex-col animate-fade-in overflow-hidden relative">
+                                 <div className="flex-1 flex flex-col animate-fade-in overflow-hidden relative min-h-0">
                                      {/* Feedback Content */}
                                      <div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col items-center justify-center text-center custom-scrollbar">
                                          <div className="text-2xl mb-1 flex-shrink-0">💡</div>
@@ -679,7 +723,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         }
         
         // Fallback
-        return <div className="flex items-center justify-center h-full"><Button onClick={() => setPhase('DECISION')}>{t('next', language)}</Button></div>;
+        return <div className="flex items-center justify-center h-full"><Button onClick={() => changePhase('DECISION')}>{t('next', language)}</Button></div>;
 
       case 'DECISION':
       case 'DECISION_PHASE_2':
@@ -691,11 +735,11 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         const selectedOptData = optionsList?.find(o => o.id === selectedOption);
 
         return (
-          <div className="h-full w-full flex flex-col items-center overflow-hidden animate-fade-in relative justify-center">
+          <div className={`h-full w-full flex flex-col items-center overflow-hidden ${animClass} relative justify-center max-w-4xl mx-auto`}>
              
              {/* Hide Question Title if answered */}
              {!selectedOption && (
-                 <div className={`bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg relative overflow-hidden transition-all flex-shrink-0 flex flex-col justify-center text-center border border-white/40 w-fit max-w-[95%] mx-auto p-3 mb-1`}>
+                 <div className={`bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg relative overflow-hidden transition-all flex-shrink-0 flex flex-col justify-center text-center border border-white/40 w-fit max-w-[95%] mx-auto p-3 mb-2 mt-2`}>
                     <p className={`relative z-10 leading-tight font-bold text-xs sm:text-base line-clamp-3`}>{questionText}</p>
                  </div>
              )}
@@ -703,14 +747,14 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
              <div className="flex-1 min-h-0 flex flex-col items-center relative w-full overflow-hidden justify-center">
                {!selectedOption ? (
                   // w-fit for options list
-                  <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-1 p-0.5 pb-1 w-fit max-w-full justify-center">
+                  <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 p-1 pb-2 w-full max-w-lg justify-center">
                     {optionsList?.map(opt => (
                        <button key={opt.id} disabled={!!selectedOption}
-                         className="py-1.5 px-3 text-start rounded-lg transition-all shadow-sm font-bold text-gray-800 text-[10px] sm:text-sm bg-white/85 hover:bg-blue-50/90 hover:shadow-md min-h-[30px] flex items-center group flex-shrink-0 leading-3 sm:leading-tight mb-0.5 backdrop-blur-sm w-full"
+                         className="py-2 px-4 text-start rounded-xl transition-all shadow-md font-bold text-gray-800 text-sm bg-white/90 hover:bg-blue-50 hover:scale-[1.01] min-h-[50px] flex items-center group flex-shrink-0 leading-tight backdrop-blur-sm w-full border border-white/20"
                          onClick={() => { playSfx('click'); setSelectedOption(opt.id); setFeedbackText(opt.feedback); }}
                        >
-                         <div className="flex items-center gap-2 w-full">
-                            <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-blue-500"></span>
+                         <div className="flex items-center gap-3 w-full">
+                            <span className="flex-shrink-0 w-2 h-2 rounded-full bg-gray-300 group-hover:bg-blue-500"></span>
                             <span className="relative z-10 flex-1 py-1">{opt.text}</span>
                          </div>
                        </button>
@@ -718,23 +762,23 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                   </div>
                ) : (
                   // COMPACT Result View - Center Screen
-                  <div className="flex flex-col animate-slide-up overflow-hidden w-fit max-w-sm mx-auto">
+                  <div className="flex flex-col animate-pop-in overflow-hidden w-full max-w-md mx-auto p-2">
                      {/* Your Choice - Compact */}
-                     <div className="bg-blue-50/90 border-r-4 border-blue-500 p-2 rounded-lg mb-1 flex-shrink-0 shadow-sm backdrop-blur-sm w-full">
-                         <span className="text-[9px] font-bold text-blue-400 uppercase tracking-wider block">{t('yourChoice', language)}</span>
-                         <p className="text-blue-900 font-bold text-xs leading-tight">{selectedOptData?.text}</p>
+                     <div className="bg-blue-50/90 border-r-4 border-blue-500 p-3 rounded-lg mb-2 flex-shrink-0 shadow-sm backdrop-blur-sm w-full">
+                         <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">{t('yourChoice', language)}</span>
+                         <p className="text-blue-900 font-bold text-sm leading-tight">{selectedOptData?.text}</p>
                      </div>
                      
                      {/* Result Card - Compact, wrapping enabled */}
-                     <div className="bg-white/90 shadow-xl rounded-xl flex flex-col items-center text-center relative overflow-hidden border border-white/50 backdrop-blur-xl w-full">
-                        <div className="p-3 flex flex-col items-center">
-                            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-yellow-100 rounded-full flex items-center justify-center text-xs sm:text-sm mb-1 shadow-inner flex-shrink-0">💡</div>
-                            <p className="text-[11px] sm:text-sm text-gray-800 font-medium leading-normal px-1 whitespace-pre-wrap">{feedbackText}</p>
+                     <div className="bg-white/90 shadow-xl rounded-xl flex flex-col items-center text-center relative overflow-hidden border border-white/50 backdrop-blur-xl w-full flex-1 min-h-0">
+                        <div className="p-4 flex flex-col items-center overflow-y-auto custom-scrollbar flex-1 min-h-0">
+                            <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner flex-shrink-0">💡</div>
+                            <p className="text-xs sm:text-sm text-gray-800 font-medium leading-relaxed px-1 whitespace-pre-wrap">{feedbackText}</p>
                         </div>
                         
-                        <div className="w-full flex flex-col gap-1 p-2 bg-slate-50/80 border-t border-gray-100 flex-shrink-0 z-10">
-                           <Button variant="outline" className="w-full py-1 text-[10px] text-blue-700 font-bold border-0 bg-blue-50/50 h-7" onClick={() => { playSfx('pop'); setShowMoreInfo(true); }}>ℹ️ {t('moreInfo', language)}</Button>
-                           <Button className="w-full py-1.5 text-xs shadow-lg bg-blue-600 text-white rounded-lg font-black h-8" onClick={handleDecisionComplete}>
+                        <div className="w-full flex flex-col gap-2 p-3 bg-slate-50/80 border-t border-gray-100 flex-shrink-0 z-10">
+                           <Button variant="outline" className="w-full py-1.5 text-xs text-blue-700 font-bold border-0 bg-blue-50/50" onClick={() => { playSfx('modal_open'); setShowMoreInfo(true); }}>ℹ️ {t('moreInfo', language)}</Button>
+                           <Button className="w-full py-2 text-sm shadow-lg bg-blue-600 text-white rounded-lg font-black" onClick={handleDecisionComplete}>
                              {isPhase2 || !data.secondaryDecisionQuestion ? (node.type === 'QUIZ' ? t('finishGame', language) : t('finishLevel', language)) : t('next', language)}
                            </Button>
                         </div>
@@ -746,13 +790,13 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
              {/* Modal for Decision Info */}
              {showMoreInfo && (
                <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
-                 <div className="bg-white/95 w-fit max-w-lg max-h-[80vh] flex flex-col rounded-2xl p-4 sm:p-6 shadow-2xl relative border border-white/50">
-                   <button onClick={() => { playSfx('click'); setShowMoreInfo(false); }} className="absolute top-3 left-3 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center font-bold text-sm z-10">✕</button>
-                   <h3 className="text-base sm:text-lg font-black text-blue-900 mb-2 border-b pb-2 pl-4 leading-tight text-right">{moreInfoTitle}</h3>
-                   <div className="overflow-y-auto flex-1 mb-2 pl-1 custom-scrollbar">
-                      <p className="text-gray-900 text-xs sm:text-sm leading-relaxed whitespace-pre-line font-medium text-right">{moreInfoContent}</p>
+                 <div className="bg-white/95 w-full max-w-lg max-h-[85vh] flex flex-col rounded-2xl p-5 shadow-2xl relative border border-white/50 animate-zoom-in">
+                   <button onClick={() => { playSfx('modal_open'); setShowMoreInfo(false); }} className="absolute top-3 left-3 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-bold text-sm z-10 hover:bg-gray-200 transition-colors">✕</button>
+                   <h3 className="text-lg font-black text-blue-900 mb-2 border-b pb-3 pl-8 leading-tight text-right">{moreInfoTitle}</h3>
+                   <div className="overflow-y-auto flex-1 mb-4 pl-1 custom-scrollbar">
+                      <p className="text-gray-900 text-sm leading-relaxed whitespace-pre-line font-medium text-right">{moreInfoContent}</p>
                    </div>
-                   <Button fullWidth onClick={() => { playSfx('click'); setShowMoreInfo(false); }} className="py-2 text-sm font-black shadow-lg rounded-xl">{t('understood', language)}</Button>
+                   <Button fullWidth onClick={() => { playSfx('modal_open'); setShowMoreInfo(false); }} className="py-2.5 text-sm font-black shadow-lg rounded-xl flex-shrink-0">{t('understood', language)}</Button>
                  </div>
                </div>
              )}
@@ -769,7 +813,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
   const bgOpacityClass = isIntro && !showIntroCard ? 'bg-transparent' : (isIntro ? 'bg-black/30' : 'bg-black/10');
 
   return (
-    <div className="absolute inset-0 h-[100dvh] bg-slate-900 flex flex-col font-sans relative overflow-hidden" onClick={handleBackgroundClick}>
+    <div className="h-full w-full flex flex-col font-sans relative overflow-hidden bg-slate-900" onClick={handleBackgroundClick}>
        {node.data.backgroundImage && (
          <div className={`absolute inset-0 z-0 animate-fade-in transition-all duration-1000 ${activeSubScene ? 'filter blur-[0px] scale-100' : ''}`}>
             <img 
@@ -784,9 +828,9 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
        )}
 
        {/* Top Bar - Ultra Compact */}
-       <div className={`p-1 sm:p-2 flex justify-between items-center sticky top-0 z-20 transition-all flex-shrink-0 h-8 sm:h-12 bg-transparent pointer-events-none ${isIntro && !showIntroCard ? 'opacity-0' : 'opacity-100'}`}>
+       <div className={`p-2 flex justify-between items-center sticky top-0 z-20 transition-all flex-shrink-0 h-12 bg-transparent pointer-events-none ${isIntro && !showIntroCard ? 'opacity-0' : 'opacity-100'}`}>
          <div className="flex gap-2 pointer-events-auto">
-             <Button variant="outline" className={`py-0.5 px-2 sm:py-1.5 sm:px-4 text-[9px] sm:text-xs rounded-full backdrop-blur-md font-bold shadow-lg bg-white/20 border-0 text-white hover:bg-white/30`} onClick={onBack}>
+             <Button variant="outline" className={`py-1 px-3 text-xs rounded-full backdrop-blur-md font-bold shadow-lg bg-white/20 border-0 text-white hover:bg-white/30`} onClick={onBack}>
                 {t('backToMap', language)}
              </Button>
              
@@ -794,7 +838,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
              {!isIntro && (
                 <Button 
                     variant="outline" 
-                    className="py-0.5 px-2 sm:py-1.5 sm:px-3 text-[9px] sm:text-xs rounded-full backdrop-blur-md font-bold shadow-lg bg-white/20 border-0 text-white hover:bg-white/30 flex items-center gap-1"
+                    className="py-1 px-3 text-xs rounded-full backdrop-blur-md font-bold shadow-lg bg-white/20 border-0 text-white hover:bg-white/30 flex items-center gap-1"
                     onClick={handleStepBack}
                 >
                     ⬅️ {t('stepBack', language)}
@@ -805,20 +849,20 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
              {node.data.digitalContent && !isIntro && (
                 <Button 
                     variant="secondary" 
-                    className="py-0.5 px-2 sm:py-1.5 sm:px-3 text-[9px] sm:text-xs rounded-full shadow-lg bg-yellow-400 text-blue-900 font-bold animate-pulse"
+                    className="py-1 px-3 text-xs rounded-full shadow-lg bg-yellow-400 text-blue-900 font-bold animate-pulse"
                     onClick={() => setShowDigitalContentModal(true)}
                 >
                     📄 {t('moreInfo', language)}
                 </Button>
              )}
          </div>
-         {!isIntro && <span className="font-bold text-white text-[9px] sm:text-xs drop-shadow-md bg-black/40 px-2 py-0.5 rounded-full truncate max-w-[120px] backdrop-blur-md pointer-events-auto border border-white/20">{node.title}</span>}
+         {!isIntro && <span className="font-bold text-white text-xs drop-shadow-md bg-black/40 px-3 py-1 rounded-full truncate max-w-[150px] backdrop-blur-md pointer-events-auto border border-white/20">{node.title}</span>}
        </div>
 
        {/* Main Container */}
-       <main className="flex-1 p-1 sm:p-4 max-w-6xl mx-auto w-full relative z-10 flex flex-col min-h-0 overflow-hidden justify-start pointer-events-none">
+       <main className="flex-1 px-2 sm:px-4 pb-2 w-full relative z-10 flex flex-col min-h-0 overflow-hidden pointer-events-none justify-center">
          {/* Re-enable pointer events for the actual content card */}
-         <div className="pointer-events-auto w-full h-full flex flex-col">
+         <div className="pointer-events-auto w-full h-full flex flex-col max-w-6xl mx-auto">
             {renderContent()}
          </div>
        </main>
@@ -826,10 +870,10 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
        {/* Digital Content Modal (Clean, separate from chat) */}
        {showDigitalContentModal && node.data.digitalContent && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowDigitalContentModal(false)}>
-                <div className="w-fit max-w-md" onClick={e => e.stopPropagation()}>
+                <div className="w-full max-w-md animate-zoom-in" onClick={e => e.stopPropagation()}>
                     <div className="relative">
                         <button 
-                            className="absolute -top-3 -right-3 w-8 h-8 bg-white text-gray-800 rounded-full flex items-center justify-center font-bold shadow-lg border border-gray-200 z-50"
+                            className="absolute -top-3 -right-3 w-8 h-8 bg-white text-gray-800 rounded-full flex items-center justify-center font-bold shadow-lg border border-gray-200 z-50 hover:bg-gray-100"
                             onClick={() => setShowDigitalContentModal(false)}
                         >
                             ✕
