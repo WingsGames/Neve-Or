@@ -292,27 +292,43 @@ const App: React.FC = () => {
 
   // --- GENERAL APP LAYOUT ---
   return (
-    // Fixed inset-0 is critical for preventing scroll on mobile and keeping everything in view
-    <div className="fixed inset-0 w-full h-full h-[100dvh] overflow-hidden bg-slate-900" dir={dir}>
-       {state.currentNodeId === 'HUB' ? (
-         <Hub 
-           nodes={state.nodes} 
-           onNodeSelect={handleNodeSelect} 
-           language={language} 
-           onLanguageChange={handleLanguageChange} 
-           onOpenDevMode={() => setState(s => ({...s, devMode: true}))}
-           onBackToIntro={() => setState(s => ({...s, currentNodeId: null}))}
-         />
-       ) : activeNode ? (
-         <SceneEngine 
-          node={activeNode} 
-          onComplete={handleSceneComplete}
-          onBack={() => setState(s => ({...s, currentNodeId: 'HUB'}))}
-          language={language}
-        />
-       ) : (
-         <div className="flex items-center justify-center h-full bg-slate-900 text-white">{t('loading', language)}</div>
-       )}
+    // SAFE CONTAINER STRATEGY:
+    // 1. Outer div is the black "letterbox" area (fixed inset-0).
+    // 2. Inner "Game Container" centers itself and constrains aspect ratio.
+    // 3. This prevents the app from becoming too "Short and Wide" which cuts off buttons.
+    <div className="fixed inset-0 w-full h-full bg-slate-950 flex items-center justify-center overflow-hidden" dir={dir}>
+      <div 
+        id="game-container"
+        className="relative w-full h-full mx-auto shadow-2xl bg-slate-900 flex flex-col overflow-hidden transition-all duration-300"
+        style={{
+            // Constrain aspect ratio to keep UI sane.
+            // If the screen is super wide (like 25:9), we restrict width to match a cinematic 21:9 ratio.
+            // If the screen is standard 16:9 or 4:3, it fills normally.
+            maxWidth: '177.78vh', // Approx 16:9 ratio based on height
+            width: '100%',
+            height: '100%'
+        }}
+      >
+        {state.currentNodeId === 'HUB' ? (
+            <Hub 
+            nodes={state.nodes} 
+            onNodeSelect={handleNodeSelect} 
+            language={language} 
+            onLanguageChange={handleLanguageChange} 
+            onOpenDevMode={() => setState(s => ({...s, devMode: true}))}
+            onBackToIntro={() => setState(s => ({...s, currentNodeId: null}))}
+            />
+        ) : activeNode ? (
+            <SceneEngine 
+            node={activeNode} 
+            onComplete={handleSceneComplete}
+            onBack={() => setState(s => ({...s, currentNodeId: 'HUB'}))}
+            language={language}
+            />
+        ) : (
+            <div className="flex items-center justify-center h-full bg-slate-900 text-white">{t('loading', language)}</div>
+        )}
+      </div>
     </div>
   );
 };

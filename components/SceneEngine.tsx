@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { GameNode, InteractionType, Language, SubScene } from '../types';
 import { Button } from './ui/Button';
@@ -216,7 +217,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
     const badgePositionClass = isRTL ? 'left-0 rounded-br-2xl' : 'right-0 rounded-bl-2xl';
 
     return (
-      <div className={`bg-white/95 backdrop-blur-md rounded-2xl shadow-xl relative overflow-hidden w-full animate-pop-in ${compact ? 'p-2' : 'p-4 sm:p-5'}`}>
+      <div className={`bg-white/95 backdrop-blur-md rounded-2xl shadow-xl relative overflow-hidden w-full animate-pop-in ${compact ? 'p-2' : 'p-3 sm:p-5'}`}>
         <div className={`absolute top-0 ${badgePositionClass} bg-yellow-400 text-blue-900 text-[9px] sm:text-xs font-black px-3 py-1 shadow-sm z-10 uppercase tracking-wide`}>
           {badgeLabel}
         </div>
@@ -354,7 +355,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
               ))}
             </div>
             {/* Footer with Button - Always visible at bottom of flex container */}
-            <div className="flex justify-center flex-shrink-0 py-2 z-30 bg-gradient-to-t from-slate-900/50 to-transparent mt-auto">
+            <div className="flex justify-center flex-shrink-0 py-2 z-30 mt-auto">
               <Button onClick={() => changePhase(data.interactionType !== InteractionType.NONE ? 'INTERACTION' : 'DECISION')} className="py-1.5 px-6 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-sm font-bold border-2 border-white/20 backdrop-blur-sm">
                 {data.interactionType !== InteractionType.NONE ? t('challenge', language) : t('next', language)}
               </Button>
@@ -408,7 +409,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                      <button key={scene.id} onClick={() => { playSfx('modal_open'); setActiveSubScene(scene); }}
                        className={`
                          relative overflow-hidden rounded-2xl transition-all shadow-lg group border-2 flex flex-col
-                         aspect-[3/4] hover:scale-105 active:scale-95 mx-auto w-full max-w-[200px]
+                         aspect-[3/4] hover:scale-105 active:scale-95 mx-auto w-full max-w-[180px]
                          ${isVisited ? 'border-green-400 ring-2 ring-green-200' : 'border-white/50 hover:border-white'}
                        `}
                      >
@@ -452,7 +453,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
            return (
              <div className={`h-full w-full flex flex-col items-center overflow-hidden relative ${animClass}`}>
                 <div className="flex-shrink-0 mb-2 z-10 max-w-[98%] mt-2">
-                   <div className="bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg p-3 text-center border border-white/40 w-fit mx-auto">
+                   <div className="bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg p-2 text-center border border-white/40 w-fit mx-auto">
                       <h3 className="text-xs sm:text-sm font-black relative z-10 leading-tight">{data.interactionData.question}</h3>
                    </div>
                 </div>
@@ -465,7 +466,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                           const isError = isSelected && !ans.correct && shakeId === ans.id;
                           return (
                             <button key={ans.id} onClick={() => handleMultipleChoice(ans)}
-                              className={`py-3 px-4 rounded-xl font-bold text-sm transition-all flex justify-between items-center text-start shadow-sm shrink-0 min-h-[50px] leading-tight backdrop-blur-sm w-full
+                              className={`py-3 px-4 rounded-xl font-bold text-sm transition-all flex justify-between items-center text-start shadow-sm shrink-0 min-h-[44px] leading-tight backdrop-blur-sm w-full
                                 ${isSelected && ans.correct ? 'bg-green-500 text-white' : isError ? 'bg-red-500 text-white animate-shake' : 'bg-white/90 text-gray-800 hover:bg-white hover:scale-[1.01]'}
                               `}
                             >
@@ -503,11 +504,11 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                 key={item.id} 
                                 onClick={() => handleShieldClick(item)}
                                 disabled={item.protected}
-                                className={`relative rounded-xl flex flex-col items-center text-center shadow-lg transition-all w-full overflow-hidden group max-w-[180px] mx-auto h-full max-h-[180px]
+                                className={`relative rounded-xl flex flex-col items-center text-center shadow-lg transition-all w-full overflow-hidden group max-w-[180px] mx-auto h-full max-h-[160px]
                                     ${item.protected ? 'bg-green-100/90 border-2 border-green-500' : shakeId === item.id ? 'bg-red-50/90 border-2 border-red-300 animate-shake' : 'bg-white/95 backdrop-blur-sm hover:scale-[1.02]'}
                                 `}
                             >
-                                <div className="w-full flex-1 bg-white relative p-1 min-h-[80px]">
+                                <div className="w-full flex-1 bg-white relative p-1 min-h-[60px]">
                                     {item.image ? (
                                         <img src={item.image} className="w-full h-full object-contain" alt="" />
                                     ) : (
@@ -516,7 +517,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                     {item.protected && <div className="absolute inset-0 flex items-center justify-center bg-green-500/30 z-20"><span className="text-3xl animate-bounce">🛡️</span></div>}
                                 </div>
 
-                                <div className="p-2 w-full flex-shrink-0 flex items-center justify-center min-h-[40px] bg-slate-50 border-t border-slate-100">
+                                <div className="p-1.5 w-full flex-shrink-0 flex items-center justify-center min-h-[30px] bg-slate-50 border-t border-slate-100">
                                      <span className="text-[10px] font-bold text-gray-900 leading-tight">{item.text}</span>
                                 </div>
                             </button>
@@ -680,7 +681,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                          <button 
                                             key={idx}
                                             onClick={() => handleCodeAnswerSelection(opt.value, currentQ.explanation)}
-                                            className={`p-2 sm:p-3 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition-all border-2 border-transparent flex items-center justify-center text-center h-full min-h-[50px]
+                                            className={`p-2 sm:p-3 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition-all border-2 border-transparent flex items-center justify-center text-center h-full min-h-[44px]
                                                 ${errorShake ? 'animate-shake bg-red-100' : 'bg-slate-50 hover:bg-blue-50 hover:border-blue-200'}
                                             `}
                                          >
@@ -711,7 +712,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
           <div className={`h-full w-full flex flex-col items-center overflow-hidden ${animClass} relative justify-center max-w-4xl mx-auto`}>
              
              {!selectedOption && (
-                 <div className={`bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg relative overflow-hidden transition-all flex-shrink-0 flex flex-col justify-center text-center border border-white/40 w-fit max-w-[95%] mx-auto p-3 mb-2 mt-2`}>
+                 <div className={`bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg relative overflow-hidden transition-all flex-shrink-0 flex flex-col justify-center text-center border border-white/40 w-fit max-w-[95%] mx-auto p-2 mb-2 mt-2`}>
                     <p className={`relative z-10 leading-tight font-bold text-xs sm:text-base line-clamp-3`}>{questionText}</p>
                  </div>
              )}
@@ -721,7 +722,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                   <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 p-1 pb-2 w-full max-w-lg justify-center">
                     {optionsList?.map(opt => (
                        <button key={opt.id} disabled={!!selectedOption}
-                         className="py-2 px-4 text-start rounded-xl transition-all shadow-md font-bold text-gray-800 text-sm bg-white/90 hover:bg-blue-50 hover:scale-[1.01] min-h-[50px] flex items-center group flex-shrink-0 leading-tight backdrop-blur-sm w-full border border-white/20"
+                         className="py-2 px-4 text-start rounded-xl transition-all shadow-md font-bold text-gray-800 text-sm bg-white/90 hover:bg-blue-50 hover:scale-[1.01] min-h-[44px] flex items-center group flex-shrink-0 leading-tight backdrop-blur-sm w-full border border-white/20"
                          onClick={() => { playSfx('click'); setSelectedOption(opt.id); setFeedbackText(opt.feedback); }}
                        >
                          <div className="flex items-center gap-3 w-full">
@@ -758,7 +759,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
              {/* Modal for Decision Info */}
              {showMoreInfo && (
                <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
-                 <div className="bg-white/95 w-full max-w-lg max-h-[85vh] flex flex-col rounded-2xl p-5 shadow-2xl relative border border-white/50 animate-zoom-in">
+                 <div className="bg-white/95 w-full max-w-lg max-h-[90vh] flex flex-col rounded-2xl p-5 shadow-2xl relative border border-white/50 animate-zoom-in">
                    <button onClick={() => { playSfx('modal_open'); setShowMoreInfo(false); }} className="absolute top-3 left-3 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-bold text-sm z-10 hover:bg-gray-200 transition-colors">✕</button>
                    <h3 className="text-lg font-black text-blue-900 mb-2 border-b pb-3 pl-8 leading-tight text-right">{moreInfoTitle}</h3>
                    <div className="overflow-y-auto flex-1 mb-4 pl-1 custom-scrollbar">
