@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect } from 'react';
 import { getInitialNodes, STORAGE_KEY } from './constants';
 import { GameState, NodeType, Language } from './types';
@@ -240,7 +238,7 @@ const App: React.FC = () => {
      if (!introNode) return <div className="flex items-center justify-center h-screen bg-slate-900 text-white">Error: Intro content not found</div>;
 
      return (
-       <div className="h-screen w-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden" dir={dir}>
+       <div className="fixed inset-0 w-full h-full bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden" dir={dir}>
          {/* Background Layer */}
          {introNode.data.backgroundImage && (
            <div className="absolute inset-0 z-0 animate-fade-in">
@@ -259,19 +257,19 @@ const App: React.FC = () => {
          </div>
 
          {/* Content Card */}
-         <div className="relative z-10 w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 sm:p-8 text-center border border-white/20 animate-fade-in-up">
-           <div className="mb-4">
+         <div className="relative z-10 w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 sm:p-8 text-center border border-white/20 animate-fade-in-up flex flex-col max-h-[90vh]">
+           <div className="mb-4 flex-shrink-0">
              <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-blue-900 drop-shadow-sm mb-2">
                {t('gameTitle', language)}
              </h1>
              <div className="h-1 w-16 bg-blue-500 mx-auto rounded-full"></div>
            </div>
            
-           <div className="mb-6 text-gray-600 text-sm sm:text-base leading-relaxed font-medium">
+           <div className="mb-6 text-gray-600 text-sm sm:text-base leading-relaxed font-medium overflow-y-auto min-h-0 flex-1 custom-scrollbar px-2">
              {introNode.data.description}
            </div>
            
-           <div className="flex flex-col items-center gap-3">
+           <div className="flex flex-col items-center gap-3 flex-shrink-0">
              <Button 
                onClick={() => handleSceneComplete()} 
                className="text-lg py-3 px-10 rounded-xl shadow-lg shadow-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 transform transition-all hover:scale-105"
@@ -284,13 +282,18 @@ const App: React.FC = () => {
          <div className="absolute bottom-4 text-white/40 text-xs font-mono z-10">
            Neve Or Human Rights Simulator © 2025
          </div>
+
+         <div className="absolute bottom-4 left-4 text-gray-400 text-[10px] font-sans font-bold z-20 opacity-60">
+           v2.1
+         </div>
        </div>
      );
   }
 
   // --- GENERAL APP LAYOUT ---
   return (
-    <div className="w-screen h-screen overflow-hidden bg-slate-900" dir={dir}>
+    // Fixed inset-0 is critical for preventing scroll on mobile and keeping everything in view
+    <div className="fixed inset-0 w-full h-full h-[100dvh] overflow-hidden bg-slate-900" dir={dir}>
        {state.currentNodeId === 'HUB' ? (
          <Hub 
            nodes={state.nodes} 
@@ -308,7 +311,7 @@ const App: React.FC = () => {
           language={language}
         />
        ) : (
-         <div className="flex items-center justify-center h-screen bg-slate-900 text-white">{t('loading', language)}</div>
+         <div className="flex items-center justify-center h-full bg-slate-900 text-white">{t('loading', language)}</div>
        )}
     </div>
   );

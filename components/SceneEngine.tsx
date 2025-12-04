@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import { GameNode, InteractionType, Language, SubScene } from '../types';
 import { Button } from './ui/Button';
@@ -321,8 +317,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
             );
         }
 
-        // If coming back to intro, maybe slide in left? But standard zoom-in is usually nice for cards.
-        // Let's use animClass if it's 'back', else zoomIn
         const introAnim = transitionDir === 'back' ? 'animate-slide-in-left' : 'animate-zoom-in';
 
         return (
@@ -353,13 +347,14 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
       case 'DIALOG':
         return (
           <div className={`flex flex-col h-full w-full max-w-4xl mx-auto relative overflow-hidden ${animClass}`}>
-            <div className="flex-1 overflow-y-auto min-h-0 p-1 mask-image-linear-gradient custom-scrollbar pb-16">
+            {/* Message Area - Takes remaining space, scrolls internally */}
+            <div className="flex-1 overflow-y-auto min-h-0 p-1 mask-image-linear-gradient custom-scrollbar pb-2">
               {data.dialog.map((msg) => (
                 <ChatBubble key={msg.id} message={msg} avatarUrl={data.characterImages?.[msg.speaker]} />
               ))}
             </div>
-            {/* Footer with Button - Fixed Height & Sticky */}
-            <div className="flex justify-center flex-shrink-0 py-2 sticky bottom-0 z-30 bg-gradient-to-t from-slate-900/50 to-transparent">
+            {/* Footer with Button - Always visible at bottom of flex container */}
+            <div className="flex justify-center flex-shrink-0 py-2 z-30 bg-gradient-to-t from-slate-900/50 to-transparent mt-auto">
               <Button onClick={() => changePhase(data.interactionType !== InteractionType.NONE ? 'INTERACTION' : 'DECISION')} className="py-1.5 px-6 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-sm font-bold border-2 border-white/20 backdrop-blur-sm">
                 {data.interactionType !== InteractionType.NONE ? t('challenge', language) : t('next', language)}
               </Button>
@@ -406,7 +401,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                  </h3>
                </div>
                
-               {/* Updated Grid for Desktop: 2 cols on small, 4 cols on large. Vertical Cards. */}
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full overflow-y-auto flex-1 min-h-0 custom-scrollbar p-2 items-center content-center">
                  {data.subScenes.map(scene => {
                    const isVisited = visitedSubScenes.has(scene.id);
@@ -418,7 +412,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                          ${isVisited ? 'border-green-400 ring-2 ring-green-200' : 'border-white/50 hover:border-white'}
                        `}
                      >
-                        {/* Image Area (Top 2/3) */}
                         <div className="h-2/3 w-full relative overflow-hidden bg-slate-800 flex-shrink-0">
                            {scene.backgroundImage ? (
                              <img src={scene.backgroundImage} className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${isVisited ? 'grayscale-[50%]' : ''}`} alt="" />
@@ -427,7 +420,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                            )}
                            <div className="absolute top-2 right-2 text-3xl drop-shadow-md">{scene.icon}</div>
                            
-                           {/* Visited Checkmark Overlay */}
                            {isVisited && (
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
                                  <div className="bg-green-500 text-white rounded-full p-2 shadow-lg border-2 border-white">✓</div>
@@ -435,7 +427,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                            )}
                         </div>
 
-                        {/* Text Area (Bottom 1/3) */}
                         <div className={`h-1/3 w-full flex flex-col items-center justify-center p-2 text-center transition-colors flex-grow ${isVisited ? 'bg-slate-100' : 'bg-white/95 backdrop-blur-md'}`}>
                            <span className="font-black text-xs sm:text-sm text-blue-900 leading-tight mb-1">{scene.title}</span>
                            <span className={`text-[10px] font-bold uppercase tracking-wider ${isVisited ? 'text-green-600' : 'text-blue-500'}`}>
@@ -461,7 +452,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
            return (
              <div className={`h-full w-full flex flex-col items-center overflow-hidden relative ${animClass}`}>
                 <div className="flex-shrink-0 mb-2 z-10 max-w-[98%] mt-2">
-                   {/* w-fit for question */}
                    <div className="bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg p-3 text-center border border-white/40 w-fit mx-auto">
                       <h3 className="text-xs sm:text-sm font-black relative z-10 leading-tight">{data.interactionData.question}</h3>
                    </div>
@@ -487,7 +477,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                      </div>
                   ) : (
                      <div className="flex-1 flex flex-col items-center justify-center animate-pop-in p-2">
-                        {/* Compact success card */}
                         <div className="bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-2xl text-center w-fit max-w-xs border border-white/50">
                            <div className="text-3xl mb-1 animate-bounce">✅</div>
                            <h3 className="text-sm font-black text-blue-900 mb-2">{t('correct', language)}</h3>
@@ -502,14 +491,12 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
         // 3. SHIELD (Node 2)
         if (data.interactionType === InteractionType.DRAG_SHIELD) {
-            // Usually minigames should "Zoom In" to focus
             return (
                 <div className="h-full w-full flex flex-col items-center relative animate-zoom-in">
                     <div className="flex-shrink-0 mb-2 mt-2">
                         {!interactionComplete && <h3 className="text-center bg-black/40 text-white backdrop-blur-md rounded-full py-1 px-4 self-center text-xs font-bold border border-white/10 w-fit">{t('shieldInst', language)}</h3>}
                     </div>
                     
-                    {/* Grid updated to much smaller container (max-w-xl) and smaller grid items */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1 overflow-y-auto min-h-0 p-2 w-full max-w-4xl items-center content-center">
                         {interactionItems.map((item) => (
                             <button 
@@ -520,7 +507,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                     ${item.protected ? 'bg-green-100/90 border-2 border-green-500' : shakeId === item.id ? 'bg-red-50/90 border-2 border-red-300 animate-shake' : 'bg-white/95 backdrop-blur-sm hover:scale-[1.02]'}
                                 `}
                             >
-                                {/* Image on TOP - changed to object-contain and reduced height to prevent crop */}
                                 <div className="w-full flex-1 bg-white relative p-1 min-h-[80px]">
                                     {item.image ? (
                                         <img src={item.image} className="w-full h-full object-contain" alt="" />
@@ -530,7 +516,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                                     {item.protected && <div className="absolute inset-0 flex items-center justify-center bg-green-500/30 z-20"><span className="text-3xl animate-bounce">🛡️</span></div>}
                                 </div>
 
-                                {/* Text Below */}
                                 <div className="p-2 w-full flex-shrink-0 flex items-center justify-center min-h-[40px] bg-slate-50 border-t border-slate-100">
                                      <span className="text-[10px] font-bold text-gray-900 leading-tight">{item.text}</span>
                                 </div>
@@ -540,7 +525,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                     
                     {interactionComplete && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-20 animate-pop-in">
-                            {/* Compact card */}
                             <div className="bg-white/95 p-3 rounded-2xl text-center shadow-2xl w-fit max-w-xs border border-white/50">
                                 <div className="text-3xl mb-1">🛡️</div>
                                 <h3 className="font-black text-blue-900 text-sm mb-2">{t('correct', language)}</h3>
@@ -563,19 +547,16 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         if (data.interactionType === InteractionType.BALLOONS) {
             return (
                 <div className="h-full w-full flex flex-col relative overflow-hidden rounded-xl animate-zoom-in">
-                    {/* Fallback Sky Gradient if no image is present */}
                     <div className="absolute inset-0 bg-gradient-to-b from-blue-300 via-blue-200 to-white opacity-60 -z-10"></div>
                     
                     <div className="flex-shrink-0 mt-2 mb-2 text-center">
                         {!interactionComplete && <h3 className="inline-block bg-black/40 text-white backdrop-blur-md rounded-full py-1 px-4 text-xs font-bold z-10 shadow-md border border-white/10">{t('balloonsInst', language)}</h3>}
                     </div>
                     
-                    <div className="flex-1 relative w-full h-full">
+                    <div className="flex-1 relative w-full h-full min-h-0">
                         {interactionItems.map((item, index) => {
                              if (item.popped) return null;
-                             // Stagger positioning
                              const leftPos = (index * 22) + 5; 
-                             // Add vertical stagger to avoid overlapping
                              const topPos = 10 + (index % 2) * 15; 
                              const delay = index * 0.5;
                              return (
@@ -601,7 +582,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                     </div>
                     {interactionComplete && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-20 animate-pop-in">
-                            {/* Compact card */}
                             <div className="bg-white/95 p-3 rounded-2xl text-center shadow-2xl w-fit max-w-xs border border-white/50">
                                 <div className="text-3xl mb-1">🎈</div>
                                 <h3 className="font-black text-blue-900 text-sm mb-2">{t('correct', language)}</h3>
@@ -624,11 +604,9 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         if (data.interactionType === InteractionType.CODE_CRACKER) {
             const currentQ = data.interactionData?.questions?.[codeStep];
             
-            // Success Screen (Code Cracked)
             if (interactionComplete) {
                 return (
                     <div className="h-full w-full flex flex-col items-center justify-center relative animate-zoom-in overflow-hidden">
-                        {/* Confetti Effect */}
                         <div className="absolute inset-0 pointer-events-none overflow-hidden">
                             {[...Array(40)].map((_, i) => (
                                 <div key={i} className="absolute animate-confetti" style={{
@@ -648,7 +626,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                              <h2 className="text-xl font-black text-blue-900 mb-2">{t('codeCracked', language)}</h2>
                              <div className="bg-green-100 text-green-800 font-mono text-2xl px-4 py-1 rounded-lg mb-4 tracking-[0.5em] border border-green-200 shadow-inner">3242</div>
                              
-                             {/* The Content Text - Prevent Scroll if possible */}
                              <div className="overflow-y-auto custom-scrollbar flex-1 min-h-0 mb-4 px-2 w-full">
                                 <p className="text-xs sm:text-sm leading-relaxed text-gray-800 font-medium whitespace-pre-wrap text-center">
                                     {data.moreInfoContent}
@@ -663,10 +640,8 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                 );
             }
 
-            // Question Screen
             return (
                 <div className={`h-full w-full flex flex-col relative ${animClass} items-center`}>
-                    {/* Header - Compact */}
                     <div className="w-fit flex justify-between items-center gap-3 bg-black/40 px-3 py-1.5 rounded-xl backdrop-blur-md mb-2 mt-2 border border-white/10 shrink-0">
                         <span className="text-white font-mono font-bold text-sm">{t('codeLabel', language)}:</span>
                         <div className="flex gap-1.5">
@@ -682,14 +657,12 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                         <div className="flex-1 w-full max-w-2xl bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl flex flex-col overflow-hidden relative border border-white/40 mb-4 mx-4 min-h-0">
                              <div className="bg-blue-600 px-2 py-1 text-white text-center font-bold text-xs shrink-0">{t('question', language)} {codeStep + 1} / 4</div>
                              
-                             {/* Question Title */}
                              <div className="p-2 sm:p-3 text-center border-b bg-white/50 shrink-0">
                                  <h3 className="font-bold text-blue-900 text-sm sm:text-base leading-tight">{currentQ.question}</h3>
                              </div>
                              
                              {showCodeFeedback ? (
                                  <div className="flex-1 flex flex-col animate-fade-in overflow-hidden relative min-h-0">
-                                     {/* Feedback Content */}
                                      <div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col items-center justify-center text-center custom-scrollbar">
                                          <div className="text-2xl mb-1 flex-shrink-0">💡</div>
                                          <p className="text-xs sm:text-sm font-bold mb-2 leading-relaxed text-gray-800">{codeFeedbackText}</p>
@@ -737,7 +710,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
         return (
           <div className={`h-full w-full flex flex-col items-center overflow-hidden ${animClass} relative justify-center max-w-4xl mx-auto`}>
              
-             {/* Hide Question Title if answered */}
              {!selectedOption && (
                  <div className={`bg-white/85 backdrop-blur-xl text-blue-900 rounded-lg shadow-lg relative overflow-hidden transition-all flex-shrink-0 flex flex-col justify-center text-center border border-white/40 w-fit max-w-[95%] mx-auto p-3 mb-2 mt-2`}>
                     <p className={`relative z-10 leading-tight font-bold text-xs sm:text-base line-clamp-3`}>{questionText}</p>
@@ -746,7 +718,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
              <div className="flex-1 min-h-0 flex flex-col items-center relative w-full overflow-hidden justify-center">
                {!selectedOption ? (
-                  // w-fit for options list
                   <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 p-1 pb-2 w-full max-w-lg justify-center">
                     {optionsList?.map(opt => (
                        <button key={opt.id} disabled={!!selectedOption}
@@ -761,15 +732,12 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                     ))}
                   </div>
                ) : (
-                  // COMPACT Result View - Center Screen
-                  <div className="flex flex-col animate-pop-in overflow-hidden w-full max-w-md mx-auto p-2">
-                     {/* Your Choice - Compact */}
+                  <div className="flex flex-col animate-pop-in overflow-hidden w-full max-w-md mx-auto p-2 h-full justify-center">
                      <div className="bg-blue-50/90 border-r-4 border-blue-500 p-3 rounded-lg mb-2 flex-shrink-0 shadow-sm backdrop-blur-sm w-full">
                          <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">{t('yourChoice', language)}</span>
                          <p className="text-blue-900 font-bold text-sm leading-tight">{selectedOptData?.text}</p>
                      </div>
                      
-                     {/* Result Card - Compact, wrapping enabled */}
                      <div className="bg-white/90 shadow-xl rounded-xl flex flex-col items-center text-center relative overflow-hidden border border-white/50 backdrop-blur-xl w-full flex-1 min-h-0">
                         <div className="p-4 flex flex-col items-center overflow-y-auto custom-scrollbar flex-1 min-h-0">
                             <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner flex-shrink-0">💡</div>
@@ -806,9 +774,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
   };
 
   const isIntro = phase === 'INTRO';
-  // Use showIntroCard to decide if we blur or not. 
-  // If it's intro AND we are waiting (showIntroCard false), keep it clear (blur-0). 
-  // Once card shows (showIntroCard true), blur it.
   const bgBlurClass = isIntro && !showIntroCard ? 'blur-0' : (isIntro ? 'blur-sm' : 'blur-0');
   const bgOpacityClass = isIntro && !showIntroCard ? 'bg-transparent' : (isIntro ? 'bg-black/30' : 'bg-black/10');
 
@@ -822,19 +787,17 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
               alt=""
               onError={(e) => e.currentTarget.style.display = 'none'}
             />
-            {/* Reduced Overlay Opacity to show more background */}
             <div className={`absolute inset-0 transition-all duration-1000 ${bgOpacityClass}`}></div>
          </div>
        )}
 
        {/* Top Bar - Ultra Compact */}
-       <div className={`p-2 flex justify-between items-center sticky top-0 z-20 transition-all flex-shrink-0 h-12 bg-transparent pointer-events-none ${isIntro && !showIntroCard ? 'opacity-0' : 'opacity-100'}`}>
+       <div className={`p-2 flex justify-between items-center z-20 transition-all flex-shrink-0 h-12 bg-transparent pointer-events-none ${isIntro && !showIntroCard ? 'opacity-0' : 'opacity-100'}`}>
          <div className="flex gap-2 pointer-events-auto">
              <Button variant="outline" className={`py-1 px-3 text-xs rounded-full backdrop-blur-md font-bold shadow-lg bg-white/20 border-0 text-white hover:bg-white/30`} onClick={onBack}>
                 {t('backToMap', language)}
              </Button>
              
-             {/* Step Back Button */}
              {!isIntro && (
                 <Button 
                     variant="outline" 
@@ -845,7 +808,6 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
                 </Button>
              )}
 
-             {/* Digital Content Toggle - Shows only if content exists and not in INTRO */}
              {node.data.digitalContent && !isIntro && (
                 <Button 
                     variant="secondary" 
@@ -861,13 +823,12 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
 
        {/* Main Container */}
        <main className="flex-1 px-2 sm:px-4 pb-2 w-full relative z-10 flex flex-col min-h-0 overflow-hidden pointer-events-none justify-center">
-         {/* Re-enable pointer events for the actual content card */}
          <div className="pointer-events-auto w-full h-full flex flex-col max-w-6xl mx-auto">
             {renderContent()}
          </div>
        </main>
 
-       {/* Digital Content Modal (Clean, separate from chat) */}
+       {/* Digital Content Modal */}
        {showDigitalContentModal && node.data.digitalContent && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setShowDigitalContentModal(false)}>
                 <div className="w-full max-w-md animate-zoom-in" onClick={e => e.stopPropagation()}>
