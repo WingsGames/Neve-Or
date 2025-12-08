@@ -89,7 +89,7 @@ export const SceneEngine: React.FC<Props> = ({ node, onComplete, onBack, languag
       timer = setTimeout(() => {
         setShowIntroCard(true);
         playSfx('bubble');
-      }, 4000);
+      }, 1000); // Reduced to 1000ms
     } else {
       setShowIntroCard(true);
     }
